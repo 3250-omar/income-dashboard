@@ -11,7 +11,7 @@ export default function ConditionalLayout({
   const pathname = usePathname();
 
   // Pages that should not have the sidebar layout
-  const noLayoutPages = ["/register"];
+  const noLayoutPages = ["/sign-in"];
 
   const shouldShowLayout = !noLayoutPages.includes(pathname);
 

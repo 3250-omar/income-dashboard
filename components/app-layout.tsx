@@ -5,19 +5,24 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, DollarSign, LogOut, Menu } from "lucide-react";
 import { useState } from "react";
+import { useClerk, useUser } from "@clerk/nextjs";
+import Image from "next/image";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { signOut } = useClerk();
+  const { user } = useUser();
+  console.log("🚀 ~ AppLayout ~ user:", user);
 
   const navigation = [
     { name: "Overview", href: "/", icon: LayoutDashboard },
     { name: "Transactions", href: "/finance", icon: DollarSign },
   ];
 
-  const handleLogout = () => {
-    // TODO: Implement logout logic
-    window.location.href = "/register";
+  const handleLogout = async () => {
+    console.log("🚀 ~ handleLogout ~ user12:");
+    await signOut({ redirectUrl: "/sign-in" });
   };
 
   return (
@@ -42,25 +47,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center gap-3 px-6 py-6 border-b">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="white"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
+            <Image
+              src={user?.imageUrl || "/user-icematte_161669-211.webp"}
+              alt="User"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
             <div>
               <h1 className="font-bold text-gray-900">Finance</h1>
-              <p className="text-xs text-gray-500">Dashboard</p>
+              <p className="text-xs text-gray-500">
+                {user?.fullName || "User Name"}
+              </p>
             </div>
           </div>
 

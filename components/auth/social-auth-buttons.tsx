@@ -1,7 +1,20 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Github } from "lucide-react";
+import { useSignIn } from "@clerk/nextjs";
 
 export function SocialAuthButtons() {
+  const { signIn, isLoaded } = useSignIn();
+
+  if (!isLoaded) return null;
+
+  const oauthSignIn = (strategy: "oauth_google" | "oauth_github") => {
+    signIn.authenticateWithRedirect({
+      strategy,
+      redirectUrl: "/",
+      redirectUrlComplete: "/",
+    });
+  };
   return (
     <div className="mt-6">
       <div className="relative">
@@ -14,7 +27,11 @@ export function SocialAuthButtons() {
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-3">
-        <Button variant="outline" className="w-full">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => oauthSignIn("oauth_google")}
+        >
           <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
             <path
               fill="currentColor"
@@ -35,7 +52,11 @@ export function SocialAuthButtons() {
           </svg>
           Google
         </Button>
-        <Button variant="outline" className="w-full">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => oauthSignIn("oauth_github")}
+        >
           <Github className="w-5 h-5 mr-2" />
           GitHub
         </Button>

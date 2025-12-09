@@ -1,5 +1,3 @@
-"use client";
-
 import {
   DashboardHeader,
   IncomeExpensesCard,
@@ -10,7 +8,7 @@ import {
 } from "@/components/dashboard";
 import { getDashboardData } from "@/lib/dashboard/get-dashboard-data";
 
-export default function Home() {
+export default async function Home() {
   // Fetch dashboard data
   const data = getDashboardData();
 
