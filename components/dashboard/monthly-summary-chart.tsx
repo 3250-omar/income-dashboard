@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
+import { memo } from "react";
 
-export function MonthlySummaryChart() {
+const MonthlySummaryChart = () => {
   return (
     <Card>
       <CardHeader>
@@ -30,4 +31,6 @@ export function MonthlySummaryChart() {
       </CardContent>
     </Card>
   );
-}
+};
+
+export default memo(MonthlySummaryChart);

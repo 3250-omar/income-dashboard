@@ -3,9 +3,9 @@ import {
   ExpenseByCategory,
   IncomeExpensesCard,
   IncomeVsExpensesChart,
-  MonthlySummaryChart,
   RecentTransactions,
 } from "@/components/dashboard";
+import MonthlySummaryChart from "@/components/dashboard/monthly-summary-chart";
 import { getDashboardData } from "@/lib/dashboard/get-dashboard-data";
 
 const HomeComponent = () => {
