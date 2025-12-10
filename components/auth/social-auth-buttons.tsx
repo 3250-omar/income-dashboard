@@ -8,12 +8,24 @@ export function SocialAuthButtons() {
 
   if (!isLoaded) return null;
 
-  const oauthSignIn = (strategy: "oauth_google" | "oauth_github") => {
-    signIn.authenticateWithRedirect({
-      strategy,
-      redirectUrl: "/",
-      redirectUrlComplete: "/",
-    });
+  const oauthSignIn = async (strategy: "oauth_google" | "oauth_github") => {
+    console.log("Attempting OAuth sign-in with strategy:", strategy);
+    const provider = strategy.split("_")[1]; // "google" or "github"
+    console.log("🚀 ~ oauthSignIn ~ provider:", provider);
+
+    if (!signIn) {
+      console.error("SignIn object is missing");
+      return;
+    }
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy,
+        redirectUrl: "/sign-in",
+        redirectUrlComplete: "/",
+      });
+    } catch (error) {
+      console.error("OAuth sign-in error:", error);
+    }
   };
   return (
     <div className="mt-6">

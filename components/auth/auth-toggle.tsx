@@ -1,5 +1,5 @@
 interface AuthToggleProps {
-  mode: "signin" | "signup";
+  mode: "signin" | "signup" | "verification";
   onToggle: () => void;
 }
 

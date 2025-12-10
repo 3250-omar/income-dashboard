@@ -1,5 +1,5 @@
 interface AuthHeaderProps {
-  mode: "signin" | "signup";
+  mode: "signin" | "signup" | "verification";
 }
 
 export function AuthHeader({ mode }: AuthHeaderProps) {

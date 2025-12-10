@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AuthHeader,
@@ -9,14 +9,27 @@ import {
   SocialAuthButtons,
   AuthToggle,
 } from "@/components/auth";
+import { useSignIn, useSignUp, useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import VerificationForm from "@/components/auth/confirm";
 
 export default function RegisterPage() {
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const { signIn, isLoaded, setActive: setSignInActive } = useSignIn();
+  const { signUp, isLoaded: isSignUpLoaded, setActive } = useSignUp();
+  const router = useRouter();
+  const { isSignedIn, user } = useUser();
+  console.log("🚀 ~ RegisterPage ~ isSignedIn:", isSignedIn);
+  console.log("🚀 ~ RegisterPage ~ user:", user);
+  const [mode, setMode] = useState<"signin" | "signup" | "verification">(
+    "signin"
+  );
   const [isLoading, setIsLoading] = useState(false);
-
   // Sign In State
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
 
   // Sign Up State
   const [signUpData, setSignUpData] = useState({
@@ -25,7 +38,12 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (isSignedIn) {
+      // User is logged in → redirect away from sign-in page
+      router.push("/"); // or your desired page
+    }
+  }, [isSignedIn, router]);
 
   const toggleMode = () => {
     setMode(mode === "signin" ? "signup" : "signin");
@@ -67,35 +85,75 @@ export default function RegisterPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  if (!isLoaded || !isSignUpLoaded) return;
 
+  const handleVerificationSubmit = async () => {
+    setIsLoading(true);
+    try {
+      const result = await signUp.attemptEmailAddressVerification({
+        code: code.join(""),
+      });
+
+      if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId });
+        router.push("/");
+      }
+    } catch (err) {
+      toast.error((err as Error)?.message || "Invalid verification code");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // TODO: Implement sign in logic
-    console.log("Sign in:", { email, password });
-    setTimeout(() => {
+
+    try {
+      const result = await signIn.create({
+        identifier: email,
+        password: password,
+      });
+      console.log("🚀 ~ handleSignInSubmit ~ result:", result);
+
+      if (result.status === "complete") {
+        await setSignInActive({ session: result.createdSessionId });
+        router.push("/");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong");
+    } finally {
       setIsLoading(false);
-      window.location.href = "/";
-    }, 1000);
+    }
   };
 
   const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateSignUpForm()) {
-      return;
-    }
-
     setIsLoading(true);
-    // TODO: Implement sign up logic
-    console.log("Sign up:", signUpData);
-    setTimeout(() => {
+    try {
+      // Create account
+      await signUp.create({
+        emailAddress: signUpData.email,
+        password: signUpData.password,
+      });
+
+      // Send verification code
+      await signUp.prepareEmailAddressVerification({
+        strategy: "email_code",
+      });
+      setMode("verification");
+    } catch (err) {
+      toast.error(
+        (err as Error)?.message ||
+          "An unexpected error occurred during sign up."
+      );
+    } finally {
       setIsLoading(false);
-      window.location.href = "/";
-    }, 1000);
+    }
   };
 
   const handleSignUpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    validateSignUpForm();
     setSignUpData({
       ...signUpData,
       [e.target.name]: e.target.value,
@@ -128,13 +186,19 @@ export default function RegisterPage() {
                 onPasswordChange={setPassword}
                 onSubmit={handleSignInSubmit}
               />
-            ) : (
+            ) : mode === "signup" ? (
               <SignUpForm
                 formData={signUpData}
                 errors={errors}
                 isLoading={isLoading}
                 onChange={handleSignUpChange}
                 onSubmit={handleSignUpSubmit}
+              />
+            ) : (
+              <VerificationForm
+                onSubmit={handleVerificationSubmit}
+                code={code}
+                setCode={setCode}
               />
             )}
 

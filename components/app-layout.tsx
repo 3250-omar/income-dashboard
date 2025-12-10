@@ -14,6 +14,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { signOut } = useClerk();
   const { user } = useUser();
   console.log("🚀 ~ AppLayout ~ user:", user);
+  if (!user) return null; // or loading skeleton
 
   const navigation = [
     { name: "Overview", href: "/", icon: LayoutDashboard },
@@ -48,7 +49,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {/* Logo */}
           <div className="flex items-center gap-3 px-6 py-6 border-b">
             <Image
-              src={user?.imageUrl || "/user-icematte_161669-211.webp"}
+              src={user.imageUrl}
               alt="User"
               width={40}
               height={40}
@@ -57,7 +58,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div>
               <h1 className="font-bold text-gray-900">Finance</h1>
               <p className="text-xs text-gray-500">
-                {user?.fullName || "User Name"}
+                {user?.fullName || user?.emailAddresses[0].emailAddress}
               </p>
             </div>
           </div>
