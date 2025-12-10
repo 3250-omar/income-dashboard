@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,15 +85,26 @@ export default function FinancePage() {
     date: new Date().toISOString().split("T")[0],
   });
 
-  const totalIncome = transactions
-    .filter((t) => t.type === "income")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const totalIncome = useMemo(
+    () =>
+      transactions
+        .filter((t) => t.type === "income")
+        .reduce((sum, t) => sum + t.amount, 0),
+    [transactions]
+  );
 
-  const totalExpenses = transactions
-    .filter((t) => t.type === "expense")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = useMemo(
+    () =>
+      transactions
+        .filter((t) => t.type === "expense")
+        .reduce((sum, t) => sum + t.amount, 0),
+    [transactions]
+  );
 
-  const balance = totalIncome - totalExpenses;
+  const balance = useMemo(
+    () => totalIncome - totalExpenses,
+    [totalIncome, totalExpenses]
+  );
 
   const generateId = () => Date.now();
 
