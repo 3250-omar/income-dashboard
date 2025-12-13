@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider, useUser } from "@clerk/nextjs";
 import { ToastContainer } from "react-toastify";
-import ConditionalLayout from "@/components/conditional-layout";
+import ConditionalLayout from "./layout/conditional-layout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

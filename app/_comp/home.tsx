@@ -1,4 +1,3 @@
-"use client";
 import {
   DashboardHeader,
   ExpenseByCategory,
@@ -8,33 +7,14 @@ import {
 } from "@/components/dashboard";
 import MonthlySummaryChart from "@/components/dashboard/monthly-summary-chart";
 import { getDashboardData } from "@/lib/dashboard/get-dashboard-data";
-import { supabase } from "@/lib/supabaseClient";
-import { supabaseServer } from "@/lib/supabaseServer";
-import { useAuth } from "@clerk/nextjs";
-import { useEffect } from "react";
 
-const HomeComponent = () => {
-  const { getToken } = useAuth();
-  useEffect(() => {
-    const setSupabaseSession = async () => {
-      const token = await getToken({ template: "supabase" });
-      if (token) {
-        console.log("test Token", token);
-        await supabase.auth.setSession({
-          access_token: token,
-          refresh_token: token,
-        });
-      }
-    };
-    setSupabaseSession();
-  }, [getToken]);
+const HomeComponent = async () => {
   const data = getDashboardData();
   return (
     <>
       <div className="p-6 space-y-6">
         {/* Header Section */}
         <DashboardHeader />
-
         {/* Summary Cards Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <IncomeExpensesCard

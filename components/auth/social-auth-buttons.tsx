@@ -1,31 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Github } from "lucide-react";
-import { useSignIn } from "@clerk/nextjs";
+import { supabase } from "@/lib/supabaseClient";
 
 export function SocialAuthButtons() {
-  const { signIn, isLoaded } = useSignIn();
-
-  if (!isLoaded) return null;
-
-  const oauthSignIn = async (strategy: "oauth_google" | "oauth_github") => {
-    console.log("Attempting OAuth sign-in with strategy:", strategy);
-    const provider = strategy.split("_")[1]; // "google" or "github"
-    console.log("🚀 ~ oauthSignIn ~ provider:", provider);
-
-    if (!signIn) {
-      console.error("SignIn object is missing");
-      return;
-    }
-    try {
-      await signIn.authenticateWithRedirect({
-        strategy,
-        redirectUrl: "/sign-in",
-        redirectUrlComplete: "/",
-      });
-    } catch (error) {
-      console.error("OAuth sign-in error:", error);
-    }
+  const oauthSignIn = async (provider: "google" | "github") => {
+    await supabase.auth.signInWithOAuth({
+      provider: provider,
+    });
   };
   return (
     <div className="mt-6">
@@ -42,7 +24,7 @@ export function SocialAuthButtons() {
         <Button
           variant="outline"
           className="w-full"
-          onClick={() => oauthSignIn("oauth_google")}
+          onClick={() => oauthSignIn("google")}
         >
           <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
             <path
@@ -67,7 +49,7 @@ export function SocialAuthButtons() {
         <Button
           variant="outline"
           className="w-full"
-          onClick={() => oauthSignIn("oauth_github")}
+          onClick={() => oauthSignIn("github")}
         >
           <Github className="w-5 h-5 mr-2" />
           GitHub

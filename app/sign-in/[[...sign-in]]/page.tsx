@@ -13,14 +13,14 @@ import { useSignIn, useSignUp, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import VerificationForm from "@/components/auth/confirm";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function RegisterPage() {
   const { signIn, isLoaded, setActive: setSignInActive } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded, setActive } = useSignUp();
   const router = useRouter();
-  const { isSignedIn, user } = useUser();
-  console.log("🚀 ~ RegisterPage ~ isSignedIn:", isSignedIn);
-  console.log("🚀 ~ RegisterPage ~ user:", user);
+  // const { isSignedIn, user } = useUser();
+
   const [mode, setMode] = useState<"signin" | "signup" | "verification">(
     "signin"
   );
@@ -38,12 +38,12 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
   });
-  useEffect(() => {
-    if (isSignedIn) {
-      // User is logged in → redirect away from sign-in page
-      router.push("/"); // or your desired page
-    }
-  }, [isSignedIn, router]);
+  // useEffect(() => {
+  //   if (isSignedIn) {
+  //     // User is logged in → redirect away from sign-in page
+  //     router.push("/"); // or your desired page
+  //   }
+  // }, [isSignedIn, router]);
 
   const toggleMode = () => {
     setMode(mode === "signin" ? "signup" : "signin");
@@ -108,48 +108,41 @@ export default function RegisterPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      const result = await signIn.create({
-        identifier: email,
-        password: password,
-      });
-      console.log("🚀 ~ handleSignInSubmit ~ result:", result);
+    // try {
+    //   const result = await signIn.create({
+    //     identifier: email,
+    //     password: password,
+    //   });
+    //   console.log("🚀 ~ handleSignInSubmit ~ result:", result);
 
-      if (result.status === "complete") {
-        await setSignInActive({ session: result.createdSessionId });
-        router.push("/");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong");
-    } finally {
-      setIsLoading(false);
+    //   if (result.status === "complete") {
+    //     await setSignInActive({ session: result.createdSessionId });
+    //     router.push("/");
+    //   }
+    // } catch (err) {
+    //   console.error(err);
+    //   toast.error("Something went wrong");
+    // } finally {
+    //   setIsLoading(false);
+    // }
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+    if (error) {
+      console.log("Error In Sign In", error);
     }
   };
 
   const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    try {
-      // Create account
-      await signUp.create({
-        emailAddress: signUpData.email,
-        password: signUpData.password,
-      });
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    });
 
-      // Send verification code
-      await signUp.prepareEmailAddressVerification({
-        strategy: "email_code",
-      });
-      setMode("verification");
-    } catch (err) {
-      toast.error(
-        (err as Error)?.message ||
-          "An unexpected error occurred during sign up."
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    if (error) console.error(error.message);
   };
 
   const handleSignUpChange = (e: React.ChangeEvent<HTMLInputElement>) => {

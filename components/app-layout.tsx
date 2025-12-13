@@ -1,30 +1,60 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, DollarSign, LogOut, Menu } from "lucide-react";
-import { useState } from "react";
-import { useClerk, useUser } from "@clerk/nextjs";
-import Image from "next/image";
+import { Menu } from "lucide-react";
+import { useState, useCallback, useEffect } from "react";
+import UserInfoAndAside from "./ui/userInfo";
+import { supabase } from "@/lib/supabaseClient";
+import type { User } from "@supabase/supabase-js";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { signOut } = useClerk();
-  const { user } = useUser();
-  console.log("🚀 ~ AppLayout ~ user:", user);
-  if (!user) return null; // or loading skeleton
+  const [user, setUser] = useState<User | null>(null);
+  console.log("user data", user);
+  const [loading, setLoading] = useState(true);
 
-  const navigation = [
-    { name: "Overview", href: "/", icon: LayoutDashboard },
-    { name: "Transactions", href: "/finance", icon: DollarSign },
-  ];
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleLogout = async () => {
-    console.log("🚀 ~ handleLogout ~ user12:");
-    await signOut({ redirectUrl: "/sign-in" });
-  };
+    getUser();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (loading) {
+      <div> Loading .....</div>;
+    }
+  }, [loading]);
+  const handleLogout = useCallback(async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -40,65 +70,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center gap-3 px-6 py-6 border-b">
-            <Image
-              src={user.imageUrl}
-              alt="User"
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
-            <div>
-              <h1 className="font-bold text-gray-900">Finance</h1>
-              <p className="text-xs text-gray-500">
-                {user?.fullName || user?.emailAddresses[0].emailAddress}
-              </p>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-primary text-white"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span className="font-medium">{item.name}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Logout Button */}
-          <div className="p-4 border-t">
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={handleLogout}
-            >
-              <LogOut className="w-5 h-5 mr-3" />
-              Log out
-            </Button>
-          </div>
-        </div>
-      </aside>
-
+      <UserInfoAndAside
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+        user={user}
+        onLogout={handleLogout}
+      />
       {/* Overlay for mobile */}
       {isSidebarOpen && (
         <div

@@ -1,7 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/lib/supabaseClient";
 import { TrendingUp } from "lucide-react";
 
-export function IncomeVsExpensesChart() {
+export async function IncomeVsExpensesChart() {
+  const { data, error, count } = await supabase.from("profiles").select("*");
+  console.log("USers", data);
   return (
     <Card>
       <CardHeader>
