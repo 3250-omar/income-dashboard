@@ -13,14 +13,15 @@ import { useSignIn, useSignUp, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import VerificationForm from "@/components/auth/confirm";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function RegisterPage() {
   const { signIn, isLoaded, setActive: setSignInActive } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded, setActive } = useSignUp();
   const router = useRouter();
-  const { isSignedIn, user } = useUser();
-  console.log("🚀 ~ RegisterPage ~ isSignedIn:", isSignedIn);
-  console.log("🚀 ~ RegisterPage ~ user:", user);
+  // const { isSignedIn, user } = useUser();
+  // console.log("🚀 ~ RegisterPage ~ isSignedIn:", isSignedIn);
+  // console.log("🚀 ~ RegisterPage ~ user:", user);
   const [mode, setMode] = useState<"signin" | "signup" | "verification">(
     "signin"
   );
@@ -38,12 +39,12 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
   });
-  useEffect(() => {
-    if (isSignedIn) {
-      // User is logged in → redirect away from sign-in page
-      router.push("/"); // or your desired page
-    }
-  }, [isSignedIn, router]);
+  // useEffect(() => {
+  //   if (isSignedIn) {
+  //     // User is logged in → redirect away from sign-in page
+  //     router.push("/"); // or your desired page
+  //   }
+  // }, [isSignedIn, router]);
 
   const toggleMode = () => {
     setMode(mode === "signin" ? "signup" : "signin");
@@ -109,16 +110,19 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const result = await signIn.create({
-        identifier: email,
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
         password: password,
       });
-      console.log("🚀 ~ handleSignInSubmit ~ result:", result);
-
-      if (result.status === "complete") {
-        await setSignInActive({ session: result.createdSessionId });
-        router.push("/");
+      console.log("🚀 ~ handleSignInSubmit ~ error:", error);
+      if (error) {
+        toast.error(error.message);
+        setIsLoading(false);
+        return;
       }
+      // ✅ Successful login
+      console.log("User:", data.user);
+      router.push("/");
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong");
@@ -132,16 +136,38 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       // Create account
-      await signUp.create({
-        emailAddress: signUpData.email,
+      const { error: signupError } = await supabase.auth.signUp({
+        email: signUpData.email,
+
         password: signUpData.password,
+        options: {
+          data: { name: signUpData.name },
+        },
       });
+      if (signupError) {
+        toast.error(signupError.message);
+        setIsLoading(false);
+        return;
+      }
+      toast.success("Sign Up is successful");
+      setMode("signin");
 
       // Send verification code
-      await signUp.prepareEmailAddressVerification({
-        strategy: "email_code",
-      });
-      setMode("verification");
+      // 2️⃣ Send OTP for verification
+      // const { error: otpError } = await supabase.auth.signInWithOtp({
+      //   email: signUpData.email,
+      //   options: {
+      //     shouldCreateUser: false,
+      //     // emailRedirectTo: `${window.location.origin}/verify-otp`,
+      //   },
+      // });
+
+      // if (otpError) {
+      //   toast.error(otpError.message);
+      //   setIsLoading(false);
+      //   return;
+      // }
+      // setMode("verification");
     } catch (err) {
       toast.error(
         (err as Error)?.message ||
