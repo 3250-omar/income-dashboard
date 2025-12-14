@@ -20,7 +20,8 @@ export default function RegisterPage() {
   const { signUp, isLoaded: isSignUpLoaded, setActive } = useSignUp();
   const router = useRouter();
   // const { isSignedIn, user } = useUser();
-
+  // console.log("🚀 ~ RegisterPage ~ isSignedIn:", isSignedIn);
+  // console.log("🚀 ~ RegisterPage ~ user:", user);
   const [mode, setMode] = useState<"signin" | "signup" | "verification">(
     "signin"
   );
@@ -108,41 +109,73 @@ export default function RegisterPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // try {
-    //   const result = await signIn.create({
-    //     identifier: email,
-    //     password: password,
-    //   });
-    //   console.log("🚀 ~ handleSignInSubmit ~ result:", result);
-
-    //   if (result.status === "complete") {
-    //     await setSignInActive({ session: result.createdSessionId });
-    //     router.push("/");
-    //   }
-    // } catch (err) {
-    //   console.error(err);
-    //   toast.error("Something went wrong");
-    // } finally {
-    //   setIsLoading(false);
-    // }
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
-    if (error) {
-      console.log("Error In Sign In", error);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+      console.log("🚀 ~ handleSignInSubmit ~ error:", error);
+      if (error) {
+        toast.error(error.message);
+        setIsLoading(false);
+        return;
+      }
+      // ✅ Successful login
+      console.log("User:", data.user);
+      router.push("/");
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
+    try {
+      // Create account
+      const { error: signupError } = await supabase.auth.signUp({
+        email: signUpData.email,
 
-    if (error) console.error(error.message);
+        password: signUpData.password,
+        options: {
+          data: { name: signUpData.name },
+        },
+      });
+      if (signupError) {
+        toast.error(signupError.message);
+        setIsLoading(false);
+        return;
+      }
+      toast.success("Sign Up is successful");
+      setMode("signin");
+
+      // Send verification code
+      // 2️⃣ Send OTP for verification
+      // const { error: otpError } = await supabase.auth.signInWithOtp({
+      //   email: signUpData.email,
+      //   options: {
+      //     shouldCreateUser: false,
+      //     // emailRedirectTo: `${window.location.origin}/verify-otp`,
+      //   },
+      // });
+
+      // if (otpError) {
+      //   toast.error(otpError.message);
+      //   setIsLoading(false);
+      //   return;
+      // }
+      // setMode("verification");
+    } catch (err) {
+      toast.error(
+        (err as Error)?.message ||
+          "An unexpected error occurred during sign up."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignUpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
