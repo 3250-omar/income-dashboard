@@ -20,15 +20,18 @@ export default function ConditionalLayout({
       }
       const user = data.session?.user;
       if (!user) return;
-
-      await supabase
-        .from("users")
-        .update({
-          name: user.user_metadata?.full_name || user.user_metadata?.name,
-          image_url:
-            user.user_metadata?.avatar_url || user.user_metadata?.picture,
-        })
-        .eq("id", user.id);
+      try {
+        await supabase
+          .from("users")
+          .update({
+            name: user.user_metadata?.full_name || user.user_metadata?.name,
+            image_url:
+              user.user_metadata?.avatar_url || user.user_metadata?.picture,
+          })
+          .eq("id", user.id);
+      } catch {
+        console.log("error While eddited");
+      }
     });
   }, []);
 
