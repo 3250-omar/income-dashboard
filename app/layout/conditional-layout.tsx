@@ -3,6 +3,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import SideBar from "@/components/sideBar";
+import { useUserStore } from "../store/user_store";
 
 export default function ConditionalLayout({
   children,
@@ -11,6 +12,7 @@ export default function ConditionalLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const setUser = useUserStore((state) => state.setUser);
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
       console.log("Test Session", data.session?.user);
@@ -20,6 +22,7 @@ export default function ConditionalLayout({
       }
       const user = data.session?.user;
       if (!user) return;
+      setUser(user);
       try {
         await supabase
           .from("users")

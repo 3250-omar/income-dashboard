@@ -7,6 +7,7 @@ create table public.incomes (
     created_at timestamp with time zone default now()
 );
 
+
 alter table public.incomes enable row level security;
 
 create policy "Users can insert own incomes"
@@ -28,3 +29,4 @@ create policy "Users can delete own incomes"
 on public.incomes
 for delete
 using (auth.uid() = user_id);
+

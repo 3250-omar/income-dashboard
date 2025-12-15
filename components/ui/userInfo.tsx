@@ -13,22 +13,20 @@ interface UserInfoAndAsideProps {
   onLogout: () => Promise<void>;
 }
 
-const UserInfoAndAside = memo(
-  ({
-    isSidebarOpen,
-    setIsSidebarOpen,
-    user,
-    onLogout,
-  }: UserInfoAndAsideProps) => {
-    return (
-      <AsideContainer
-        user={user}
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-        handleLogout={onLogout}
-      />
-    );
-  }
-);
+const UserInfoAndAside = ({
+  isSidebarOpen,
+  setIsSidebarOpen,
+  user,
+  onLogout,
+}: UserInfoAndAsideProps) => {
+  return (
+    <AsideContainer
+      user={user}
+      isSidebarOpen={isSidebarOpen}
+      setIsSidebarOpen={setIsSidebarOpen}
+      handleLogout={onLogout}
+    />
+  );
+};
 
-export default UserInfoAndAside;
+export default memo(UserInfoAndAside);

@@ -6,10 +6,11 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { User } from "@supabase/supabase-js";
 
 const SideBar = () => {
   const router = useRouter();
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   useEffect(() => {
     supabase.auth

@@ -6,9 +6,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./button";
+import { User } from "@supabase/supabase-js";
 
 interface NavifationCompProps {
-  user: any;
+  user: User | null;
   isSidebarOpen: boolean;
   setIsSidebarOpen: (isSidebarOpen: boolean) => void;
   handleLogout: () => void;
@@ -37,7 +38,9 @@ const NavigationComp = ({
         <div>
           <h1 className="font-bold text-gray-900">Finance</h1>
           <p className="text-xs text-gray-500">
-            {user?.user_metadata?.full_name || user?.email}
+            {user?.user_metadata?.full_name ||
+              user?.user_metadata?.name ||
+              user?.email}
           </p>
         </div>
       </div>
