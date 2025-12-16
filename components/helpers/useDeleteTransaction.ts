@@ -1,8 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 
 export const useDeleteTransaction = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
@@ -14,7 +16,11 @@ export const useDeleteTransaction = () => {
     },
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      // Invalidate all queries that start with "transactions"
+      queryClient.invalidateQueries({
+        queryKey: ["transactions"],
+        refetchType: "active",
+      });
       queryClient.invalidateQueries({ queryKey: ["financial-summary"] });
     },
   });

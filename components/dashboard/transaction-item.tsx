@@ -1,11 +1,10 @@
-import { LucideIcon } from "lucide-react";
+import { categoryIcons } from "@/app/constants";
 
 interface TransactionItemProps {
   type: "income" | "expense";
   category: string;
   amount: number;
   date: string;
-  icon: LucideIcon;
 }
 
 export function TransactionItem({
@@ -13,8 +12,8 @@ export function TransactionItem({
   category,
   amount,
   date,
-  icon: Icon,
 }: TransactionItemProps) {
+  const Icon = categoryIcons[category] ?? categoryIcons["Other"];
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -37,7 +36,7 @@ export function TransactionItem({
           type === "income" ? "text-green-600" : "text-red-600"
         }`}
       >
-        {type === "income" ? "+" : "-"} ${amount.toFixed(2)}
+        {type === "income" ? "+" : "-"} ${amount}
       </p>
     </div>
   );

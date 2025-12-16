@@ -16,6 +16,8 @@ import {
   Heart,
 } from "lucide-react";
 import { useTransactions } from "@/components/helpers/useTransactions";
+import { useDeleteTransaction } from "@/components/helpers/useDeleteTransaction";
+import { categoryIcons } from "@/app/constants";
 
 type Transaction = {
   id: number;
@@ -25,28 +27,15 @@ type Transaction = {
   description: string;
   date: string;
 };
-const categoryIcons: Record<string, LucideIcon> = {
-  Salary: DollarSign,
-  Food: Utensils,
-  Bills: HomeIcon,
-  Shopping: ShoppingCart,
-  Entertainment: Film,
-  Transportation: Car,
-  Healthcare: Heart,
-  Other: MoreHorizontal,
-};
+
 interface TransactionsListProps {
-  transactions: Transaction[];
   onEdit: (transaction: Transaction) => void;
   onDelete: (id: number) => void;
 }
 
-export default function TransactionsList({
-  transactions,
-  onEdit,
-  onDelete,
-}: TransactionsListProps) {
+export default function TransactionsList() {
   const { data } = useTransactions();
+  const { mutate } = useDeleteTransaction();
   console.log("🚀 ~ TransactionsList ~ data:", data);
   return (
     <Card>
@@ -99,17 +88,17 @@ export default function TransactionsList({
                       {transaction.amount.toFixed(2)}
                     </p>
                     <div className="flex gap-2">
-                      <Button
+                      {/* <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => onEdit(transaction)}
                       >
                         <Edit className="w-4 h-4" />
-                      </Button>
+                      </Button> */}
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => onDelete(transaction?.id)}
+                        onClick={() => mutate(transaction.id)}
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </Button>

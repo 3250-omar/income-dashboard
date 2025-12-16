@@ -1,16 +1,12 @@
+import { useFinancialSummary } from "@/components/helpers/useFinancialSummary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface SummaryCardsProps {
-  totalIncome: number;
-  totalExpenses: number;
-  balance: number;
-}
-
-export default function SummaryCards({
-  totalIncome,
-  totalExpenses,
-  balance,
-}: SummaryCardsProps) {
+export default function SummaryCards() {
+  const { data } = useFinancialSummary();
+  console.log("🚀 ~ SummaryCards ~ data:", data);
+  if (!data) {
+    return;
+  }
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <Card>
@@ -21,7 +17,7 @@ export default function SummaryCards({
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold text-green-600">
-            ${totalIncome.toFixed(2)}
+            ${data?.income}
           </div>
         </CardContent>
       </Card>
@@ -34,7 +30,7 @@ export default function SummaryCards({
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold text-red-600">
-            ${totalExpenses.toFixed(2)}
+            ${data?.expenses}
           </div>
         </CardContent>
       </Card>
@@ -48,10 +44,10 @@ export default function SummaryCards({
         <CardContent>
           <div
             className={`text-3xl font-bold ${
-              balance >= 0 ? "text-green-600" : "text-red-600"
+              data?.balance >= 0 ? "text-green-600" : "text-red-600"
             }`}
           >
-            ${balance.toFixed(2)}
+            ${data?.balance}
           </div>
         </CardContent>
       </Card>

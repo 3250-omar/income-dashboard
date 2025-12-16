@@ -1,9 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { useUserStore } from "@/app/store/user_store";
 
 export const useCreateTransaction = () => {
+  const queryClient = useQueryClient();
+
   const user = useUserStore((state) => {
     return state.user;
   });
@@ -28,7 +30,11 @@ export const useCreateTransaction = () => {
     },
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      // Invalidate all queries that start with "transactions"
+      queryClient.invalidateQueries({
+        queryKey: ["transactions"],
+        refetchType: "active",
+      });
       queryClient.invalidateQueries({ queryKey: ["financial-summary"] });
     },
   });

@@ -1,8 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 
 export const useUpdateTransaction = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async ({
       id,

@@ -12,6 +12,7 @@ interface ExpenseByCategoryProps {
 }
 
 export function ExpenseByCategory({ categories }: ExpenseByCategoryProps) {
+  console.log("🚀 ~ ExpenseByCategory ~ categories:", categories);
   return (
     <Card>
       <CardHeader>

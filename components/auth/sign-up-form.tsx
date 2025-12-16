@@ -3,6 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, User } from "lucide-react";
 import Link from "next/link";
+import ImageUpload from "../imageUploadReview";
+import { useState } from "react";
 
 interface SignUpFormProps {
   formData: {
@@ -26,6 +28,7 @@ export function SignUpForm({
 }: SignUpFormProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      <ImageUpload />
       <div className="space-y-2">
         <Label htmlFor="name">Full Name</Label>
         <div className="relative">
