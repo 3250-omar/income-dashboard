@@ -8,15 +8,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Plus } from "lucide-react";
 
 type Transaction = {
@@ -37,14 +28,14 @@ type FormData = {
 };
 
 interface HeaderProps {
-  setFormData: (formData: FormData) => void;
+  setFormData: any;
   setEditingTransaction: any;
   isDialogOpen: boolean;
   setIsDialogOpen: (isOpen: boolean) => void;
   editingTransaction: Transaction | null;
   formData: FormData;
   setTransactions: any;
-  transactions: any;
+  transactions: Transaction[];
 }
 
 const HeaderComp = ({

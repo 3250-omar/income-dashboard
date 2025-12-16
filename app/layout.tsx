@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider, useUser } from "@clerk/nextjs";
 import { ToastContainer } from "react-toastify";
 import ConditionalLayout from "./layout/conditional-layout";
 import Providers from "./layout/provider";
@@ -32,10 +31,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <ClerkProvider>
-            <ToastContainer />
-            <ConditionalLayout>{children}</ConditionalLayout>
-          </ClerkProvider>
+          <ToastContainer />
+          <ConditionalLayout>{children}</ConditionalLayout>
         </Providers>
       </body>
     </html>

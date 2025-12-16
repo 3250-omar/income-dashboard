@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AuthHeader,
@@ -9,15 +9,12 @@ import {
   SocialAuthButtons,
   AuthToggle,
 } from "@/components/auth";
-import { useSignIn, useSignUp, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import VerificationForm from "@/components/auth/confirm";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function RegisterPage() {
-  const { signIn, isLoaded, setActive: setSignInActive } = useSignIn();
-  const { signUp, isLoaded: isSignUpLoaded, setActive } = useSignUp();
   const router = useRouter();
   // const { isSignedIn, user } = useUser();
   // console.log("🚀 ~ RegisterPage ~ isSignedIn:", isSignedIn);
@@ -86,25 +83,24 @@ export default function RegisterPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  if (!isLoaded || !isSignUpLoaded) return;
 
-  const handleVerificationSubmit = async () => {
-    setIsLoading(true);
-    try {
-      const result = await signUp.attemptEmailAddressVerification({
-        code: code.join(""),
-      });
+  // const handleVerificationSubmit = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const result = await signUp.attemptEmailAddressVerification({
+  //       code: code.join(""),
+  //     });
 
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-        router.push("/");
-      }
-    } catch (err) {
-      toast.error((err as Error)?.message || "Invalid verification code");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     if (result.status === "complete") {
+  //       await setActive({ session: result.createdSessionId });
+  //       router.push("/");
+  //     }
+  //   } catch (err) {
+  //     toast.error((err as Error)?.message || "Invalid verification code");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
   const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -222,7 +218,7 @@ export default function RegisterPage() {
               />
             ) : (
               <VerificationForm
-                onSubmit={handleVerificationSubmit}
+                onSubmit={() => {}}
                 code={code}
                 setCode={setCode}
               />

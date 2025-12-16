@@ -1,23 +1,11 @@
 "use client";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  LucideIcon,
-  DollarSign,
-  Utensils,
-  HomeIcon,
-  ShoppingCart,
-  Film,
-  Car,
-  Heart,
-} from "lucide-react";
+import { Edit, Trash2, MoreHorizontal } from "lucide-react";
 import { useTransactions } from "@/components/helpers/useTransactions";
 import { useDeleteTransaction } from "@/components/helpers/useDeleteTransaction";
 import { categoryIcons } from "@/app/constants";
+import { useUpdateTransaction } from "@/components/helpers/useUpdateTransaction";
 
 type Transaction = {
   id: number;
@@ -29,14 +17,23 @@ type Transaction = {
 };
 
 interface TransactionsListProps {
-  onEdit: (transaction: Transaction) => void;
-  onDelete: (id: number) => void;
+  setIsDialogOpen: (open: boolean) => void;
+  setEditingTransaction: (transaction: Transaction | null) => void;
 }
 
-export default function TransactionsList() {
+export default function TransactionsList({
+  setIsDialogOpen,
+  setEditingTransaction,
+}: TransactionsListProps) {
   const { data } = useTransactions();
   const { mutate } = useDeleteTransaction();
+  const { mutate: updateTransaction } = useUpdateTransaction();
   console.log("🚀 ~ TransactionsList ~ data:", data);
+  const handleEdit = (transaction: Transaction) => {
+    console.log("🚀 ~ handleEdit ~ transaction:", transaction);
+    setIsDialogOpen(true);
+    setEditingTransaction(transaction);
+  };
   return (
     <Card>
       <CardHeader>
@@ -88,13 +85,13 @@ export default function TransactionsList() {
                       {transaction.amount.toFixed(2)}
                     </p>
                     <div className="flex gap-2">
-                      {/* <Button
+                      <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => onEdit(transaction)}
+                        onClick={() => handleEdit(transaction)}
                       >
                         <Edit className="w-4 h-4" />
-                      </Button> */}
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
