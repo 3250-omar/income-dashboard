@@ -1,17 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  DollarSign,
-  Utensils,
-  Home as HomeIcon,
-  ShoppingCart,
-  Film,
-  Car,
-  Heart,
-  MoreHorizontal,
-  LucideIcon,
-} from "lucide-react";
+
 import HeaderComp from "./header";
 import SummaryCards from "./summary-cards";
 import TransactionsList from "./transactions-list";

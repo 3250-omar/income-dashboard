@@ -6,13 +6,10 @@ import {
   RecentTransactions,
 } from "@/components/dashboard";
 import MonthlySummaryChart from "@/components/dashboard/monthly-summary-chart";
-import { getAllIncomes } from "@/components/helpers/incomes";
 import { getDashboardData } from "@/lib/dashboard/get-dashboard-data";
 
 const HomeComponent = async () => {
   const data = await getDashboardData();
-  const { data: incomes, count: incomeCount } = await getAllIncomes();
-  console.log("🚀 ~ HomeComponent ~ incomes:", incomes);
 
   return (
     <>

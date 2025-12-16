@@ -4,6 +4,7 @@ import "./globals.css";
 import { ClerkProvider, useUser } from "@clerk/nextjs";
 import { ToastContainer } from "react-toastify";
 import ConditionalLayout from "./layout/conditional-layout";
+import Providers from "./layout/provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +31,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ClerkProvider>
-          <ToastContainer />
-          <ConditionalLayout>{children}</ConditionalLayout>
-        </ClerkProvider>
+        <Providers>
+          <ClerkProvider>
+            <ToastContainer />
+            <ConditionalLayout>{children}</ConditionalLayout>
+          </ClerkProvider>
+        </Providers>
       </body>
     </html>
   );
