@@ -2,17 +2,13 @@ import { User } from "@supabase/supabase-js";
 import NavigationComp from "./navigationComp";
 
 interface AsideContainerProps {
-  user: User | null;
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
-  handleLogout: () => Promise<void>;
 }
 
 const AsideContainer = ({
-  user,
   isSidebarOpen,
   setIsSidebarOpen,
-  handleLogout,
 }: AsideContainerProps) => {
   return (
     <aside
@@ -21,10 +17,8 @@ const AsideContainer = ({
       }`}
     >
       <NavigationComp
-        user={user}
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
-        handleLogout={handleLogout}
       />
     </aside>
   );

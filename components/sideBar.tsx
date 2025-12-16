@@ -9,23 +9,7 @@ import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 
 const SideBar = () => {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  useEffect(() => {
-    supabase.auth
-      .getUser()
-      .then(({ data }) => setUser(data.user))
-      .catch((err) => toast.error(String(err)));
-  }, []);
-  const logOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      router.push("/sign-in");
-    } catch (error) {
-      toast.error(`Error is : ${error}`);
-    }
-  };
 
   return (
     <>
@@ -43,8 +27,6 @@ const SideBar = () => {
       <UserInfoAndAside
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
-        user={user}
-        onLogout={logOut}
       />
       {/* Overlay for mobile */}
       {isSidebarOpen && (

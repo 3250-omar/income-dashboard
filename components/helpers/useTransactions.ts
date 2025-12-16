@@ -14,7 +14,7 @@ export const useTransactions = (type?: "income" | "expense") => {
       if (type) {
         query = query.eq("type", type);
       }
-
+      
       const { data, error } = await query;
       if (error) throw error;
 

@@ -48,32 +48,33 @@ const HeaderComp = ({
   formData,
   transactions,
 }: HeaderProps) => {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("event", e);
-    const newTransaction: Transaction = {
-      id: editingTransaction?.id || generateId(),
-      type: formData.type,
-      category: formData.category,
-      amount: parseFloat(formData.amount),
-      description: formData.description,
-      date: formData.date,
-    };
+  // const generateId = () => Date.now();
 
-    if (editingTransaction) {
-      setTransactions(
-        transactions.map((t: Transaction) =>
-          t.id === editingTransaction.id ? newTransaction : t
-        )
-      );
-    } else {
-      setTransactions([...transactions, newTransaction]);
-    }
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   console.log("event", e);
+  //   const newTransaction: Transaction = {
+  //     id: editingTransaction?.id || generateId(),
+  //     type: formData.type,
+  //     category: formData.category,
+  //     amount: parseFloat(formData.amount),
+  //     description: formData.description,
+  //     date: formData.date,
+  //   };
 
-    resetForm();
-    setIsDialogOpen(false);
-  };
-  const generateId = () => Date.now();
+  //   if (editingTransaction) {
+  //     setTransactions(
+  //       transactions.map((t: Transaction) =>
+  //         t.id === editingTransaction.id ? newTransaction : t
+  //       )
+  //     );
+  //   } else {
+  //     setTransactions([...transactions, newTransaction]);
+  //   }
+
+  //   resetForm();
+  //   setIsDialogOpen(false);
+  // };
 
   const resetForm = () => {
     setFormData({

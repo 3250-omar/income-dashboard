@@ -6,8 +6,8 @@ import MonthlySummaryChart from "@/components/dashboard/monthly-summary-chart";
 import { RecentTransactions } from "@/components/dashboard/recent-transactions";
 import { getDashboardData } from "@/lib/dashboard/get-dashboard-data";
 
-const HomeComponent = async () => {
-  const data = await getDashboardData();
+const HomeComponent = () => {
+  const data = getDashboardData();
 
   return (
     <>

@@ -7,21 +7,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./button";
 import { User } from "@supabase/supabase-js";
+import { useUserStore } from "@/app/store/user_store";
+import { DropdownMenuDemo } from "./sideBarDropDownMenu";
 
 interface NavifationCompProps {
-  user: User | null;
   isSidebarOpen: boolean;
   setIsSidebarOpen: (isSidebarOpen: boolean) => void;
-  handleLogout: () => void;
 }
 
 const NavigationComp = ({
-  user,
   isSidebarOpen,
   setIsSidebarOpen,
-  handleLogout,
 }: NavifationCompProps) => {
   const pathName = usePathname();
+  const user = useUserStore((state) => state.user);
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
@@ -68,15 +67,16 @@ const NavigationComp = ({
       </nav>
 
       {/* Logout Button */}
-      <div className="p-4 border-t">
-        <Button
+      <div className="p-4 border-t flex justify-center">
+        {/* <Button
           variant="outline"
           className="w-full justify-start"
           onClick={handleLogout}
         >
           <LogOut className="w-5 h-5 mr-3" />
           Log out
-        </Button>
+        </Button> */}
+        <DropdownMenuDemo />
       </div>
     </div>
   );

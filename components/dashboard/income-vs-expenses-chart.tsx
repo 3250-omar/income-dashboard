@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
+import { ChartLineDefault } from "./lineChart";
 
 export async function IncomeVsExpensesChart() {
   return (
@@ -7,7 +8,7 @@ export async function IncomeVsExpensesChart() {
       <CardHeader>
         <CardTitle>Income vs Expenses</CardTitle>
       </CardHeader>
-      <CardContent>
+      {/* <CardContent>
         <div className="h-48 flex items-center justify-center bg-gray-50 rounded-lg">
           <div className="text-center">
             <TrendingUp className="w-12 h-12 mx-auto text-gray-400 mb-2" />
@@ -25,7 +26,8 @@ export async function IncomeVsExpensesChart() {
             <span className="text-sm text-gray-600">Expenses</span>
           </div>
         </div>
-      </CardContent>
+      </CardContent> */}
+      <ChartLineDefault />
     </Card>
   );
 }
