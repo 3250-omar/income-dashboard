@@ -1,12 +1,10 @@
 "use client";
 
 import { navigation } from "@/app/constants";
-import { LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "./button";
-import { User } from "@supabase/supabase-js";
+
 import { useUserStore } from "@/app/store/user_store";
 import { DropdownMenuDemo } from "./sideBarDropDownMenu";
 
@@ -20,26 +18,23 @@ const NavigationComp = ({
   setIsSidebarOpen,
 }: NavifationCompProps) => {
   const pathName = usePathname();
-  const user = useUserStore((state) => state.user);
+  const profile = useUserStore((state) => state.profile);
+
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-6 border-b">
         <Image
-          src={
-            user?.user_metadata?.avatar_url || "/user-icematte_161669-211.webp"
-          }
+          src={profile?.image_url || "/user-icematte_161669-211.webp"}
           alt="User"
           width={40}
           height={40}
-          className="rounded-full"
+          className="rounded-full h-10 w-10 object-cover"
         />
         <div>
           <h1 className="font-bold text-gray-900">Finance</h1>
           <p className="text-xs text-gray-500">
-            {user?.user_metadata?.full_name ||
-              user?.user_metadata?.name ||
-              user?.email}
+            {profile?.name || profile?.email}
           </p>
         </div>
       </div>

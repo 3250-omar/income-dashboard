@@ -10,12 +10,13 @@ import { toast } from "react-toastify";
 import Image from "next/image";
 import { Camera, Lock, Mail, User } from "lucide-react";
 import { useUserStore } from "../store/user_store";
+import { UpdateUserInfo } from "@/components/helpers/user";
 
 const EditProfile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { mutate: updateUser } = UpdateUserInfo();
   const [loading, setLoading] = useState(false);
-  const user = useUserStore((state) => state.user);
-  console.log(":", user);
+  // const { user } = useUserStore();
   const [userData, setUserData] = useState({
     image_url: "",
     username: "",
@@ -29,6 +30,7 @@ const EditProfile = () => {
   const [imagePreview, setImagePreview] = useState<string>("");
   const [userProfile, setUserProfile] = useState<any>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  console.log("🚀 ~ EditProfile ~ userId:", userId);
 
   // Fetch authenticated user and profile
   useEffect(() => {
@@ -105,17 +107,15 @@ const EditProfile = () => {
 
     try {
       setLoading(true);
-      await supabase
-        .from("users")
-        .update({
-          name: userData.username,
-          email: userData.email,
-          image_url: userData.image_url,
-        })
-        .eq("id", userId);
-
-      toast.success("Profile updated successfully");
-    } catch (error) {
+      updateUser({
+        userId,
+        data: {
+          name: userData?.username,
+          email: userData?.email,
+          image_url: userData?.image_url,
+        },
+      });
+    } catch {
       toast.error("Failed to update profile");
     } finally {
       setLoading(false);

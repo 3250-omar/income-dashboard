@@ -3,10 +3,6 @@ import { Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import UserInfoAndAside from "./ui/userInfo";
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
-import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
-import { User } from "@supabase/supabase-js";
 
 const SideBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

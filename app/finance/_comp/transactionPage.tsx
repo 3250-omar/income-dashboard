@@ -68,6 +68,7 @@ export default function TransactionPageComp() {
   //     category: transaction.category,
   //     amount: transaction.amount.toString(),
   //     description: transaction.description,
+
   //     date: transaction.date,
   //   });
   //   setIsDialogOpen(true);

@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 
 export const useUpdateUserProfile = () => {
   const updateUserProfile = async (
-    userId: string,
+    userId: string | number,
     data: {
       name?: string;
       email?: string;
