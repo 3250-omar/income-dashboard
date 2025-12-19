@@ -17,7 +17,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { useTransactions } from "../helpers/useTransactions";
+import { useTransactions } from "../../../components/helpers/useTransactions";
 import { memo } from "react";
 
 export const description = "A line chart";

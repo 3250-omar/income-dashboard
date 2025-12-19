@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, User } from "lucide-react";
 import Link from "next/link";
-import ImageUpload from "../imageUploadReview";
+import ImageUpload from "../../../../components/imageUploadReview";
 import { useState } from "react";
 
 interface SignUpFormProps {

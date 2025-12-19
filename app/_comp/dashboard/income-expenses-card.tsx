@@ -2,9 +2,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useFinancialSummary } from "../helpers/useFinancialSummary";
+import { useFinancialSummary } from "../../../components/helpers/useFinancialSummary";
 
-export function IncomeExpensesCard() {
+const IncomeExpensesCard = () => {
   const { data } = useFinancialSummary();
   return (
     <Card>
@@ -26,9 +26,11 @@ export function IncomeExpensesCard() {
           </div>
         </div>
         <Button className="w-full" asChild>
-          <Link href="/finance">Add Transaction</Link>
+          <Link href="/transactions">Add Transaction</Link>
         </Button>
       </CardContent>
     </Card>
   );
-}
+};
+
+export default IncomeExpensesCard;

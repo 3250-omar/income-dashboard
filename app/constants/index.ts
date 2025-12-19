@@ -13,7 +13,7 @@ import {
 
 export const navigation = [
   { name: "Overview", href: "/", icon: LayoutDashboard },
-  { name: "Transactions", href: "/finance", icon: DollarSign },
+  { name: "Transactions", href: "/transactions", icon: DollarSign },
 ];
 
 export const categoryIcons: Record<string, LucideIcon> = {

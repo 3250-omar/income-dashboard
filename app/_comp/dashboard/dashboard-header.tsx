@@ -12,7 +12,7 @@ export function DashboardHeader() {
         <p className="text-gray-600 mt-1">Track your income and expenses</p>
       </div>
       <Button asChild>
-        <Link href="/finance">Add Transaction</Link>
+        <Link href="/transactions">Add Transaction</Link>
       </Button>
     </div>
   );

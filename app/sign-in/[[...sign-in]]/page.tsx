@@ -8,10 +8,10 @@ import {
   SignUpForm,
   SocialAuthButtons,
   AuthToggle,
-} from "@/components/auth";
+} from "@/app/sign-in/[[...sign-in]]/_comp";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import VerificationForm from "@/components/auth/confirm";
+import VerificationForm from "@/app/sign-in/[[...sign-in]]/_comp/confirm";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function RegisterPage() {

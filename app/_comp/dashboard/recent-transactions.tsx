@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TransactionItem } from "./transaction-item";
 import { LucideIcon } from "lucide-react";
-import { useTransactions } from "../helpers/useTransactions";
+import { useTransactions } from "../../../components/helpers/useTransactions";
 
 export interface Transaction {
   id: number;

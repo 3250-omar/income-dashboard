@@ -32,7 +32,7 @@ const NavigationComp = ({
           className="rounded-full h-10 w-10 object-cover"
         />
         <div>
-          <h1 className="font-bold text-gray-900">Finance</h1>
+          <h1 className="font-bold text-gray-900">Budget Management</h1>
           <p className="text-xs text-gray-500">
             {profile?.name || profile?.email}
           </p>

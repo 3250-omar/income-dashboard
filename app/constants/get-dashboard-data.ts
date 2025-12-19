@@ -3,7 +3,6 @@ import { DashboardData } from "@/types/dashboard";
 
 /**
  * Fetches dashboard data
- * TODO: Replace with actual Prisma database queries
  */
 export function getDashboardData(): DashboardData {
   const totalIncome = 4325.0;

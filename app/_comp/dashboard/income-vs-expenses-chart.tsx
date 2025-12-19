@@ -1,8 +1,9 @@
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
 import { ChartLineDefault } from "./lineChart";
 
-export async function IncomeVsExpensesChart() {
+const IncomeVsExpensesChart = () => {
   return (
     <Card>
       <CardHeader>
@@ -30,4 +31,6 @@ export async function IncomeVsExpensesChart() {
       <ChartLineDefault />
     </Card>
   );
-}
+};
+
+export default IncomeVsExpensesChart;

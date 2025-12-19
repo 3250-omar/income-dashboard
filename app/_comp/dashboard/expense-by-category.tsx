@@ -8,10 +8,10 @@ export interface ExpenseCategory {
 }
 
 interface ExpenseByCategoryProps {
-  categories: ExpenseCategory[];
+  categories?: ExpenseCategory[];
 }
 
-export function ExpenseByCategory({ categories }: ExpenseByCategoryProps) {
+const ExpenseByCategory = ({ categories }: ExpenseByCategoryProps) => {
   console.log("🚀 ~ ExpenseByCategory ~ categories:", categories);
   return (
     <Card>
@@ -20,16 +20,17 @@ export function ExpenseByCategory({ categories }: ExpenseByCategoryProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {categories.map((item, index) => (
+          {/* {categories.map((item, index) => (
             <CategoryProgressBar
               key={index}
               category={item.category}
               percentage={item.percentage}
               color={item.color}
             />
-          ))}
+          ))} */}
         </div>
       </CardContent>
     </Card>
   );
-}
+};
+export default ExpenseByCategory;
