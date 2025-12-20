@@ -1,47 +1,43 @@
+import { useUserStore } from "@/app/store/user_store";
+import { queryClient } from "@/lib/react-query";
 import { supabase } from "@/lib/supabaseClient";
-import { toast } from "react-toastify";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useUpdateUserProfile = () => {
-  const updateUserProfile = async (
-    userId: string | number,
-    data: {
-      name?: string;
-      email?: string;
-      image_url?: string;
-    }
-  ) => {
-    if (!userId) {
-      toast.error("User ID is required");
-      return false;
-    }
-
-    if (data.name && !data.name.trim()) {
-      toast.error("Username cannot be empty");
-      return false;
-    }
-
-    try {
-      const { error } = await supabase
+    const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["user"],
+    mutationFn: async (data?: any ) => {
+      console.log("data12", data);
+      const { error , data: userData } = await supabase
         .from("users")
         .update({
-          name: data.name,
-          email: data.email,
-          image_url: data.image_url,
+          name: data?.name,
+          // email: data?.email,
+          image_url: data?.image_url,
         })
-        .eq("id", userId);
+        .eq("id", data?.userId).select()
+        .single();
+      const { error: authError } = await supabase.auth.updateUser({
+        email: data?.email,
+        data: {
+          full_name: data?.name,
+          avatar_url: data?.image_url,
+        },
+      });
+        console.log("userData123", userData);
+      if (error || authError) {
+      throw new Error(error?.message || authError?.message);
+      } 
+      return userData;
+    },  
+      onSuccess: (userData) => {
+      queryClient.invalidateQueries({
+        queryKey: ["user"],
+        refetchType: "active",
+      });
+      useUserStore.getState().setSessionUserData(userData);
+    },
 
-      if (error) {
-        toast.error(`Failed to update profile: ${error.message}`);
-        return false;
-      }
-
-      toast.success("Profile updated successfully");
-      return true;
-    } catch (error) {
-      toast.error("Failed to update profile");
-      return false;
-    }
-  };
-
-  return { updateUserProfile };
-};
+  });
+  }

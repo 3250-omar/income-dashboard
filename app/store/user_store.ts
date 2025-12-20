@@ -1,24 +1,22 @@
+import { userType } from "@/types/user";
 import { User } from "@supabase/supabase-js";
 import { create } from "zustand";
 
-interface UserProfile {
-  id: string;
-  name: string | null;
-  email: string | null;
-  image_url: string | null;
-  created_at?: string;
-}
 
 interface UserStore {
-  user: User | null;
-  profile: UserProfile | null;
-  setUser: (user: User | null) => void;
-  setProfile: (profile: UserProfile | null) => void;
+  sessionUserData: User | null;
+  profile: userType | null;
+  setSessionUserData: (user: User | null) => void;
+  setProfile: (profile: userType | null) => void;
+    dialogIsOpen: boolean;
+  setDialogIsOpen: (isOpen: boolean) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
-  user: null,
+  sessionUserData: null,
+  dialogIsOpen: false,
   profile: null,
-  setUser: (user) => set({ user }),
+  setSessionUserData: (sessionUserData) => set({ sessionUserData }),
   setProfile: (profile) => set({ profile }),
+  setDialogIsOpen: (isOpen) => set({ dialogIsOpen: isOpen }),
 }));

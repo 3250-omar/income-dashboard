@@ -13,8 +13,9 @@ export const useFinancialSummary = () => {
       return {
         income,
         expenses,
-        balance: income - expenses,
+        balance: income   - expenses,
       };
     },
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };

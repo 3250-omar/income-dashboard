@@ -1,24 +1,17 @@
+import { useUserStore } from "@/app/store/user_store";
 import { supabase } from "@/lib/supabaseClient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { useUserStore } from "@/app/store/user_store";
 
 export const deleteUser = async (id: string) => {
   supabase.from("users").delete().eq("id", id);
 };
-export const updateUser = async (
-  id: string,
-  data: { name?: string; email?: string; password?: string; image_url?: string }
-) => {
-  supabase.from("users").update(data).eq("id", id);
-};
+
 
 export const UpdateUserInfo = () => {
   const queryClient = useQueryClient();
-  const setProfile = useUserStore((state) => state.setProfile);
-
   return useMutation({
-    mutationKey: ["user"],
+    mutationKey: ["userUpdate"],
     mutationFn: async ({
       userId,
       data,
@@ -39,10 +32,8 @@ export const UpdateUserInfo = () => {
       return updatedUser;
     },
     onSuccess: (updatedUser) => {
-      if (updatedUser) {
-        setProfile(updatedUser);
-      }
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      useUserStore.getState().setSessionUserData(updatedUser);
       toast.success("Profile updated successfully");
     },
   });

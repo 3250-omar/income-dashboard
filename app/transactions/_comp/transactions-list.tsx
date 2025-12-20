@@ -6,6 +6,7 @@ import { useTransactions } from "@/components/helpers/useTransactions";
 import { useDeleteTransaction } from "@/components/helpers/useDeleteTransaction";
 import { categoryIcons } from "@/app/constants";
 import { useUpdateTransaction } from "@/components/helpers/useUpdateTransaction";
+import { useUserStore } from "@/app/store/user_store";
 
 type Transaction = {
   id: number;
@@ -17,21 +18,20 @@ type Transaction = {
 };
 
 interface TransactionsListProps {
-  setIsDialogOpen: (open: boolean) => void;
   setEditingTransaction: (transaction: Transaction | null) => void;
 }
 
 export default function TransactionsList({
-  setIsDialogOpen,
   setEditingTransaction,
 }: TransactionsListProps) {
   const { data } = useTransactions();
+  const { setDialogIsOpen } = useUserStore();
   const { mutate } = useDeleteTransaction();
   const { mutate: updateTransaction } = useUpdateTransaction();
   console.log("🚀 ~ TransactionsList ~ data:", data);
   const handleEdit = (transaction: Transaction) => {
     console.log("🚀 ~ handleEdit ~ transaction:", transaction);
-    setIsDialogOpen(true);
+    setDialogIsOpen(true);
     setEditingTransaction(transaction);
   };
   return (
@@ -48,7 +48,9 @@ export default function TransactionsList({
           <div className="space-y-3">
             {data?.map((transaction) => {
               const Icon =
-                categoryIcons[transaction.category] || MoreHorizontal;
+                categoryIcons[
+                  transaction.category as keyof typeof categoryIcons
+                ] || MoreHorizontal;
               return (
                 <div
                   key={transaction.id}

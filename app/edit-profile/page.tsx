@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, EventHandler } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { uploadImage } from "@/components/helpers/uploadImage";
 import { Button } from "@/components/ui/button";
@@ -9,110 +9,83 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import { Camera, Lock, Mail, User } from "lucide-react";
-import { useUserStore } from "../store/user_store";
 import { UpdateUserInfo } from "@/components/helpers/user";
+import { useUserStore } from "@/app/store/user_store";
+import { getUserData } from "@/app/hooks/getUserData";
+import EventEmitter from "events";
+import ProfileImageUpload from "@/components/ui/profileImageUpload";
 
 const EditProfile = () => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { mutate: updateUser } = UpdateUserInfo();
+  const sessionUserData = useUserStore((state) => state.sessionUserData);
+  const { data: userProfile } = getUserData({
+    userId: sessionUserData?.id,
+  });
+
   const [loading, setLoading] = useState(false);
-  // const { user } = useUserStore();
   const [userData, setUserData] = useState({
-    image_url: "",
-    username: "",
-    email: "",
+    image_url: userProfile?.image_url || "",
+    username: userProfile?.name || "",
+    email: userProfile?.email || "",
   });
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
-  const [imagePreview, setImagePreview] = useState<string>("");
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  console.log("🚀 ~ EditProfile ~ userId:", userId);
+  const [imagePreview, setImagePreview] = useState<string>(
+    userProfile?.image_url || ""
+  );
+  const [file, setFile] = useState<any>(null);
 
-  // Fetch authenticated user and profile
+  // Update userData when userProfile changes
   useEffect(() => {
-    const fetchUserData = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        toast.error("Not authenticated");
-        return;
-      }
-
-      setUserId(user.id);
-
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (error) {
-        toast.error("Failed to load profile");
-        return;
-      }
-
-      if (data) {
-        setUserProfile(data);
-        setUserData({
-          image_url: data.image_url || "",
-          username: data.name || "",
-          email: data.email || user.email || "",
-        });
-        setImagePreview(data.image_url || "");
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
-  // Handle image upload
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-
-    // Upload to supabase
-    try {
-      setLoading(true);
-      const publicUrl = await uploadImage(file);
-      setUserData((prev) => ({ ...prev, image_url: publicUrl }));
-      toast.success("Image uploaded successfully");
-    } catch (error) {
-      toast.error("Failed to upload image");
-    } finally {
-      setLoading(false);
+    if (userProfile) {
+      setUserData({
+        image_url: userProfile.image_url || "",
+        username: userProfile.name || "",
+        email: userProfile.email || "",
+      });
+      setImagePreview(userProfile.image_url || "");
     }
-  };
+  }, [userProfile]);
 
   // Handle profile update
   const handleUpdateProfile = async () => {
-    if (!userId) return;
-
+    if (!sessionUserData?.id) return;
     if (!userData.username.trim()) {
       toast.error("Username cannot be empty");
       return;
     }
-
     try {
       setLoading(true);
+      let newImageUrl = userData?.image_url; // fallback to existing image
+
+      if (file) {
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${sessionUserData.id}.${Date.now()}.${fileExt}`;
+        const filePath = `UserImages/${fileName}`;
+        const { error: uploadError } = await supabase.storage
+          .from("image")
+          .upload(filePath, file, { upsert: true });
+
+        if (uploadError) {
+          console.log("uploadingErr", uploadError);
+          return;
+        }
+
+        const { data: publicUrlData } = await supabase.storage
+          .from("image")
+          .getPublicUrl(filePath);
+        newImageUrl = publicUrlData.publicUrl;
+      }
       updateUser({
-        userId,
+        userId: sessionUserData.id,
         data: {
           name: userData?.username,
-          email: userData?.email,
-          image_url: userData?.image_url,
+          // email: userData?.email,
+          image_url:
+            userData?.image_url !== newImageUrl ? newImageUrl : undefined,
         },
       });
     } catch {
@@ -172,7 +145,7 @@ const EditProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-indigo-50 p-4 sm:p-6 lg:p-8">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -183,45 +156,11 @@ const EditProfile = () => {
             Manage your account information and settings
           </p>
         </div>
-
-        {/* Profile Image Section */}
-        <Card className="p-6 mb-6 border-0 shadow-lg">
-          <div className="flex flex-col items-center">
-            <div className="relative mb-6">
-              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 p-1">
-                {imagePreview ? (
-                  <Image
-                    src={imagePreview}
-                    alt="Profile"
-                    width={128}
-                    height={128}
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
-                    <User size={64} className="text-gray-400" />
-                  </div>
-                )}
-              </div>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition-colors shadow-lg"
-              >
-                <Camera size={20} />
-              </button>
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="hidden"
-            />
-            <p className="text-sm text-gray-600 text-center">
-              Click the camera icon to upload a new profile picture
-            </p>
-          </div>
-        </Card>
+        {/* Profile Image Upload Section */}
+        <ProfileImageUpload
+          setFile={setFile}
+          userProfileImage={userProfile?.image_url || ""}
+        />
 
         {/* Profile Information Section */}
         <Card className="p-6 mb-6 border-0 shadow-lg">
@@ -249,13 +188,14 @@ const EditProfile = () => {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                 <Mail size={16} />
                 Email Address
               </label>
               <Input
                 type="email"
                 value={userData.email}
+                disabled
                 onChange={(e) =>
                   setUserData((prev) => ({ ...prev, email: e.target.value }))
                 }

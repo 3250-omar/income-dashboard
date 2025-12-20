@@ -25,7 +25,7 @@ export function RecentTransactions() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {transactions.map((transaction) => (
+          {/* {transactions.map((transaction) => (
             <TransactionItem
               key={transaction.id}
               type={transaction.type}
@@ -33,12 +33,12 @@ export function RecentTransactions() {
               amount={transaction.amount}
               date={transaction.date}
             />
-          ))}
-          {!transactions.length && (
+          ))} */}
+          {!transactions.length ? (
             <div className="text-center py-12 text-gray-500 font-bold">
               No Transactions Found
             </div>
-          )}
+          ) : null}
         </div>
       </CardContent>
     </Card>

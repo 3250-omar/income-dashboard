@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"; // Added Import
 import { useCreateTransaction } from "../helpers/useCreateTransaction";
+import { useUserStore } from "@/app/store/user_store";
 
 const formSchema = z.object({
   type: z.enum(["income", "expense"]),
@@ -38,13 +39,13 @@ const formSchema = z.object({
   date: z.date(),
 });
 
-const FormContainer = ({
-  setIsDialogOpen,
-}: {
-  setIsDialogOpen: (state: boolean) => void;
-}) => {
-  const createTransaction = useCreateTransaction();
+const FormContainer = () => {
+  const { setDialogIsOpen } = useUserStore();
+  const { mutate, isPending, isSuccess } = useCreateTransaction();
 
+  if (isSuccess) {
+    console.log("Transaction Added successfully");
+  }
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,13 +58,12 @@ const FormContainer = ({
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("values123", values);
-    createTransaction.mutate(values);
+    await mutate(values as any);
     form.reset();
-    setIsDialogOpen(false);
+    setDialogIsOpen(false);
   }
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

@@ -1,4 +1,4 @@
-import { User } from "@supabase/supabase-js";
+"use client";
 import NavigationComp from "./navigationComp";
 
 interface AsideContainerProps {

@@ -7,10 +7,12 @@ import {
   LazyIncomeVsExpensesChart,
   LazyMonthlySummaryChart,
 } from "./_comp/exportedCharts";
+import { useUserStore } from "./store/user_store";
 
 // Home page content
 //only import client components and dynamic imports here
 const Home = () => {
+  const { dialogIsOpen, setDialogIsOpen } = useUserStore();
   return (
     <>
       <div className="p-6 space-y-6">

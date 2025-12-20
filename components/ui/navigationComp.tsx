@@ -4,9 +4,9 @@ import { navigation } from "@/app/constants";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
 import { useUserStore } from "@/app/store/user_store";
 import { DropdownMenuDemo } from "./sideBarDropDownMenu";
+import { getUserData } from "@/app/hooks/getUserData";
 
 interface NavifationCompProps {
   isSidebarOpen: boolean;
@@ -18,23 +18,30 @@ const NavigationComp = ({
   setIsSidebarOpen,
 }: NavifationCompProps) => {
   const pathName = usePathname();
-  const profile = useUserStore((state) => state.profile);
+  const sessionUserData = useUserStore((state) => state.sessionUserData);
+  console.log("sessionUserData", sessionUserData);
+  const { data: userData } = getUserData({
+    userId: sessionUserData?.id,
+    enabled: !!sessionUserData?.id,
+  });
+
+  console.log("profileop", userData);
 
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-6 border-b">
         <Image
-          src={profile?.image_url || "/user-icematte_161669-211.webp"}
+          src={userData?.image_url || "/user-icematte_161669-211.webp"}
           alt="User"
           width={40}
           height={40}
           className="rounded-full h-10 w-10 object-cover"
         />
         <div>
-          <h1 className="font-bold text-gray-900">Budget Management</h1>
+          <h1 className="font-bold text-gray-900">Finance</h1>
           <p className="text-xs text-gray-500">
-            {profile?.name || profile?.email}
+            {userData?.name || userData?.email}
           </p>
         </div>
       </div>
@@ -61,16 +68,8 @@ const NavigationComp = ({
         })}
       </nav>
 
-      {/* Logout Button */}
+      {/* Options Buttons */}
       <div className="p-4 border-t flex justify-center">
-        {/* <Button
-          variant="outline"
-          className="w-full justify-start"
-          onClick={handleLogout}
-        >
-          <LogOut className="w-5 h-5 mr-3" />
-          Log out
-        </Button> */}
         <DropdownMenuDemo />
       </div>
     </div>

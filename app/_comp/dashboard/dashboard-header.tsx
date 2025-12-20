@@ -1,8 +1,10 @@
 "use client";
+import { useUserStore } from "@/app/store/user_store";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Plus } from "lucide-react";
 
 export function DashboardHeader() {
+  const { setDialogIsOpen } = useUserStore();
   return (
     <div className="flex items-center justify-between">
       <div>
@@ -11,8 +13,10 @@ export function DashboardHeader() {
         </h1>
         <p className="text-gray-600 mt-1">Track your income and expenses</p>
       </div>
-      <Button asChild>
-        <Link href="/transactions">Add Transaction</Link>
+      <Button onClick={() => setDialogIsOpen(true)}>
+        {" "}
+        <Plus className="w-5 h-5 mr-2" />
+        Add Transaction
       </Button>
     </div>
   );

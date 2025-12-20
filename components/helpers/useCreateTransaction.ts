@@ -6,10 +6,7 @@ import { useUserStore } from "@/app/store/user_store";
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
 
-  const user = useUserStore((state) => {
-    return state.user;
-  });
-  console.log("🚀 ~ useCreateTransaction ~ user:", user);
+  const sessionUserData = useUserStore((state) => state.sessionUserData);
 
   return useMutation({
     mutationFn: async (payload: {
@@ -19,11 +16,11 @@ export const useCreateTransaction = () => {
       description?: string;
       date: string;
     }) => {
-      if (!user) throw new Error("Not authenticated");
+      if (!sessionUserData) throw new Error("Not authenticated");
 
       const { error } = await supabase.from("transactions").insert({
         ...payload,
-        user_id: user.id,
+        user_id: sessionUserData.id,
       });
 
       if (error) throw error;

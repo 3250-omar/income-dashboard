@@ -5,6 +5,7 @@ import { Mail, Lock, User } from "lucide-react";
 import Link from "next/link";
 import ImageUpload from "../../../../components/imageUploadReview";
 import { useState } from "react";
+import ProfileImageUpload from "@/components/ui/profileImageUpload";
 
 interface SignUpFormProps {
   formData: {
@@ -17,6 +18,7 @@ interface SignUpFormProps {
   isLoading: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
+  setFile: (file: File) => void;
 }
 
 export function SignUpForm({
@@ -25,10 +27,11 @@ export function SignUpForm({
   isLoading,
   onChange,
   onSubmit,
+  setFile,
 }: SignUpFormProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <ImageUpload />
+      <ProfileImageUpload setFile={setFile} />
       <div className="space-y-2">
         <Label htmlFor="name">Full Name</Label>
         <div className="relative">

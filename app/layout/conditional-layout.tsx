@@ -5,6 +5,14 @@ import { supabase } from "@/lib/supabaseClient";
 import SideBar from "@/components/sideBar";
 import { useUserStore } from "../store/user_store";
 import { User } from "@supabase/supabase-js";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import FormContainer from "@/components/reusableComponents/Form";
+import path from "path";
 
 export default function ConditionalLayout({
   children,
@@ -15,48 +23,35 @@ export default function ConditionalLayout({
   console.log("🚀 ~ ConditionalLayout ~ testUser:", testUser);
   const router = useRouter();
   const pathname = usePathname();
-  const setUser = useUserStore((state) => state.setUser);
+  const setUser = useUserStore((state) => state.setSessionUserData);
   const setProfile = useUserStore((state) => state.setProfile);
-
+  const { dialogIsOpen, setDialogIsOpen } = useUserStore();
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      console.log("Test Session", data.session?.user);
+    supabase.auth.getUser().then(async ({ data }) => {
+      console.log("Test Session", data?.user);
 
-      if (!data.session) {
+      if (!data.user) {
         router.push("/sign-in");
         return;
       }
-      const user = data.session?.user;
+      const sessionUserData = data?.user;
 
-      if (!user) return;
-      setUser(user);
-      setTestUser(user);
-
-      // Fetch profile from users table
-      const { data: profileData } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (profileData) {
-        setProfile(profileData);
-      }
-
+      if (!sessionUserData) return;
+      setUser(sessionUserData);
+      console.log("🚀 ~ ConditionalLayout ~ profile:", sessionUserData);
       try {
         await supabase
           .from("users")
           .update({
-            name: user.user_metadata?.full_name || user.user_metadata?.name,
-            image_url:
-              user.user_metadata?.avatar_url || user.user_metadata?.picture,
+            name: sessionUserData.user_metadata?.name,
+            image_url: sessionUserData.user_metadata?.image_url,
           })
-          .eq("id", user.id);
+          .eq("id", sessionUserData.id);
       } catch {
         console.log("error While eddited");
       }
     });
-  }, [router, setProfile, setUser]);
+  }, [setProfile, setUser, pathname]);
 
   if (pathname.includes("sign-in")) {
     return (
@@ -70,6 +65,20 @@ export default function ConditionalLayout({
     <div className="min-h-screen bg-gray-50">
       <SideBar />
       <div className="lg:pl-64">{children}</div>
+      <Dialog
+        open={dialogIsOpen}
+        onOpenChange={(open) => {
+          setDialogIsOpen(open);
+          // if (!open) resetForm();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{"Transaction"}</DialogTitle>
+          </DialogHeader>
+          <FormContainer />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

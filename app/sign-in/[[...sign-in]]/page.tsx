@@ -8,17 +8,16 @@ import {
   SignUpForm,
   SocialAuthButtons,
   AuthToggle,
-} from "@/app/sign-in/[[...sign-in]]/_comp";
+} from "./_comp";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import VerificationForm from "@/app/sign-in/[[...sign-in]]/_comp/confirm";
 import { supabase } from "@/lib/supabaseClient";
+import VerificationForm from "./_comp/confirm";
+import { useUserStore } from "@/app/store/user_store";
 
 export default function RegisterPage() {
   const router = useRouter();
-  // const { isSignedIn, user } = useUser();
-  // console.log("🚀 ~ RegisterPage ~ isSignedIn:", isSignedIn);
-  // console.log("🚀 ~ RegisterPage ~ user:", user);
+  const setSessionUserData = useUserStore((state) => state.setSessionUserData);
   const [mode, setMode] = useState<"signin" | "signup" | "verification">(
     "signin"
   );
@@ -28,20 +27,15 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [code, setCode] = useState(["", "", "", "", "", ""]);
-
+  const [file, setFile] = useState<File | null>(null);
   // Sign Up State
   const [signUpData, setSignUpData] = useState({
     name: "",
     email: "",
+    image_url: "",
     password: "",
     confirmPassword: "",
   });
-  // useEffect(() => {
-  //   if (isSignedIn) {
-  //     // User is logged in → redirect away from sign-in page
-  //     router.push("/"); // or your desired page
-  //   }
-  // }, [isSignedIn, router]);
 
   const toggleMode = () => {
     setMode(mode === "signin" ? "signup" : "signin");
@@ -52,6 +46,7 @@ export default function RegisterPage() {
       name: "",
       email: "",
       password: "",
+      image_url: "",
       confirmPassword: "",
     });
     setErrors({});
@@ -84,23 +79,6 @@ export default function RegisterPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // const handleVerificationSubmit = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const result = await signUp.attemptEmailAddressVerification({
-  //       code: code.join(""),
-  //     });
-
-  //     if (result.status === "complete") {
-  //       await setActive({ session: result.createdSessionId });
-  //       router.push("/");
-  //     }
-  //   } catch (err) {
-  //     toast.error((err as Error)?.message || "Invalid verification code");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
   const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -130,14 +108,33 @@ export default function RegisterPage() {
   const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    let newImageUrl = signUpData.image_url; // fallback to existing image
+
+    if (file) {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `UserImages/${fileName}`;
+      const { error: uploadError } = await supabase.storage
+        .from("image")
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) {
+        console.log("uploadingErr", uploadError);
+        return;
+      }
+
+      const { data: publicUrlData } = await supabase.storage
+        .from("image")
+        .getPublicUrl(filePath);
+      newImageUrl = publicUrlData.publicUrl;
+    }
     try {
       // Create account
       const { error: signupError } = await supabase.auth.signUp({
         email: signUpData.email,
-
         password: signUpData.password,
         options: {
-          data: { name: signUpData.name },
+          data: { name: signUpData.name, image_url: newImageUrl },
         },
       });
       if (signupError) {
@@ -147,23 +144,6 @@ export default function RegisterPage() {
       }
       toast.success("Sign Up is successful");
       setMode("signin");
-
-      // Send verification code
-      // 2️⃣ Send OTP for verification
-      // const { error: otpError } = await supabase.auth.signInWithOtp({
-      //   email: signUpData.email,
-      //   options: {
-      //     shouldCreateUser: false,
-      //     // emailRedirectTo: `${window.location.origin}/verify-otp`,
-      //   },
-      // });
-
-      // if (otpError) {
-      //   toast.error(otpError.message);
-      //   setIsLoading(false);
-      //   return;
-      // }
-      // setMode("verification");
     } catch (err) {
       toast.error(
         (err as Error)?.message ||
@@ -193,7 +173,6 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
         <AuthHeader mode={mode} />
-
         <Card>
           <CardHeader>
             <CardTitle>{mode === "signin" ? "Sign In" : "Sign Up"}</CardTitle>
@@ -215,6 +194,7 @@ export default function RegisterPage() {
                 isLoading={isLoading}
                 onChange={handleSignUpChange}
                 onSubmit={handleSignUpSubmit}
+                setFile={setFile}
               />
             ) : (
               <VerificationForm
