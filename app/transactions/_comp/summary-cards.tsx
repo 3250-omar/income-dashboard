@@ -1,8 +1,13 @@
+import { useUserStore } from "@/app/store/user_store";
 import { useFinancialSummary } from "@/components/helpers/useFinancialSummary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function SummaryCards() {
-  const { data } = useFinancialSummary();
+  const { sessionUserData } = useUserStore();
+  const { data } = useFinancialSummary({
+    userId: sessionUserData?.id,
+    enabled: !!sessionUserData?.id,
+  });
   console.log("🚀 ~ SummaryCards ~ data:", data);
   if (!data) {
     return;

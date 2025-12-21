@@ -51,7 +51,7 @@ export default function ConditionalLayout({
         console.log("error While eddited");
       }
     });
-  }, [setProfile, setUser, pathname]);
+  }, [setProfile, setUser, router]);
 
   if (pathname.includes("sign-in")) {
     return (

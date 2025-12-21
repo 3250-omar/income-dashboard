@@ -36,7 +36,7 @@ const EditProfile = () => {
   const [imagePreview, setImagePreview] = useState<string>(
     userProfile?.image_url || ""
   );
-  const [file, setFile] = useState<any>(null);
+  const [file, setFile] = useState<File | null>(null);
 
   // Update userData when userProfile changes
   useEffect(() => {

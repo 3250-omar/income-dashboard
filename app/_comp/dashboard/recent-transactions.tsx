@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TransactionItem } from "./transaction-item";
 import { LucideIcon } from "lucide-react";
 import { useTransactions } from "../../../components/helpers/useTransactions";
+import { useUserStore } from "@/app/store/user_store";
 
 export interface Transaction {
   id: number;
@@ -14,7 +15,11 @@ export interface Transaction {
 }
 
 export function RecentTransactions() {
-  const { data: transactions } = useTransactions();
+  const { sessionUserData } = useUserStore();
+  const { data: transactions } = useTransactions({
+    userId: sessionUserData?.id,
+    enabled: !!sessionUserData?.id,
+  });
   if (!transactions) {
     return;
   }

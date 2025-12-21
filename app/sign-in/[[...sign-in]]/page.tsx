@@ -89,6 +89,7 @@ export default function RegisterPage() {
         password: password,
       });
       console.log("🚀 ~ handleSignInSubmit ~ error:", error);
+      setSessionUserData(data.user);
       if (error) {
         toast.error(error.message);
         setIsLoading(false);

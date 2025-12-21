@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/chart";
 import { useTransactions } from "../../../components/helpers/useTransactions";
 import { memo } from "react";
+import { useUserStore } from "@/app/store/user_store";
 
 export const description = "A line chart";
 
@@ -39,7 +40,11 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export const ChartLineDefault = memo(function ChartLineDefault() {
-  const { data } = useTransactions();
+  const { sessionUserData } = useUserStore();
+  const { data } = useTransactions({
+    userId: sessionUserData?.id,
+    enabled: !!sessionUserData?.id,
+  });
   return (
     <Card>
       <CardHeader>

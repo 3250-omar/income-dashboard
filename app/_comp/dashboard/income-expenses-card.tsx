@@ -3,9 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useFinancialSummary } from "../../../components/helpers/useFinancialSummary";
+import { useUserStore } from "@/app/store/user_store";
 
 const IncomeExpensesCard = () => {
-  const { data } = useFinancialSummary();
+  const { sessionUserData } = useUserStore();
+  const { data } = useFinancialSummary({
+    enabled: !!sessionUserData?.id,
+    userId: sessionUserData?.id,
+  });
   return (
     <Card>
       <CardHeader>

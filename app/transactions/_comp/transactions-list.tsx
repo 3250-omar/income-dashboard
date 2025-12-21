@@ -24,7 +24,11 @@ interface TransactionsListProps {
 export default function TransactionsList({
   setEditingTransaction,
 }: TransactionsListProps) {
-  const { data } = useTransactions();
+  const { sessionUserData } = useUserStore();
+  const { data } = useTransactions({
+    userId: sessionUserData?.id,
+    enabled: !!sessionUserData?.id,
+  });
   const { setDialogIsOpen } = useUserStore();
   const { mutate } = useDeleteTransaction();
   const { mutate: updateTransaction } = useUpdateTransaction();
