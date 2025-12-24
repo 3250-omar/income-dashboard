@@ -2,13 +2,12 @@ import { userType } from "@/types/user";
 import { User } from "@supabase/supabase-js";
 import { create } from "zustand";
 
-
 interface UserStore {
   sessionUserData: User | null;
   profile: userType | null;
   setSessionUserData: (user: User | null) => void;
   setProfile: (profile: userType | null) => void;
-    dialogIsOpen: boolean;
+  dialogIsOpen: boolean;
   setDialogIsOpen: (isOpen: boolean) => void;
 }
 

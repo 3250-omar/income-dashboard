@@ -1,5 +1,7 @@
 import {
+  Banknote,
   Car,
+  ClipboardList,
   DollarSign,
   Film,
   Heart,
@@ -7,13 +9,22 @@ import {
   LayoutDashboard,
   LucideIcon,
   MoreHorizontal,
+  PiggyBank,
+  Settings,
   ShoppingCart,
+  Target,
   Utensils,
+  Wallet,
 } from "lucide-react";
 
 export const navigation = [
-  { name: "Overview", href: "/", icon: LayoutDashboard },
-  { name: "Transactions", href: "/transactions", icon: DollarSign },
+  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Transactions", href: "/transactions", icon: ClipboardList },
+  { name: "Budgets", href: "/budgets", icon: PiggyBank },
+  { name: "Reports", href: "/reports", icon: Banknote },
+  { name: "Accounts", href: "/accounts", icon: Wallet },
+  { name: "Goals", href: "/goals", icon: Target },
+  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 export const categoryIcons: Record<string, LucideIcon> = {

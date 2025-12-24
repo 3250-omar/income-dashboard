@@ -1,39 +1,35 @@
-"use client";
-import { DashboardHeader } from "@/app/_comp/dashboard/dashboard-header";
-import { RecentTransactions } from "@/app/_comp/dashboard/recent-transactions";
-import IncomeExpensesCard from "@/app/_comp/dashboard/income-expenses-card";
-import {
-  LazyExpenseByCategory,
-  LazyIncomeVsExpensesChart,
-  LazyMonthlySummaryChart,
-} from "./_comp/exportedCharts";
-import { useUserStore } from "./store/user_store";
+import { SummaryCards } from "@/components/dashboard/summary-cards";
+import { IncomeExpensesChart } from "@/components/dashboard/income-expenses-chart";
+import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
+import { RecentTransactionsTable } from "@/components/dashboard/recent-transactions-table";
+import { RecentTransactionsList } from "@/components/dashboard/recent-transactions-list";
 
-// Home page content
-//only import client components and dynamic imports here
 const Home = () => {
-  const { dialogIsOpen, setDialogIsOpen } = useUserStore();
   return (
-    <>
-      <div className="p-6 space-y-6">
-        {/* Header Section */}
-        <DashboardHeader />
-        {/* Summary Cards Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <IncomeExpensesCard />
-          <LazyIncomeVsExpensesChart />
-        </div>
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Top Section: Summary Cards */}
+      <SummaryCards />
 
-        {/* Transactions and Categories Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <RecentTransactions />
-          <LazyExpenseByCategory />
+      {/* Middle Section: Main Chart & Breakdown */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="xl:col-span-2">
+          <IncomeExpensesChart />
         </div>
-
-        {/* Monthly Summary Section */}
-        <LazyMonthlySummaryChart />
+        <div className="xl:col-span-1">
+          <ExpenseBreakdown />
+        </div>
       </div>
-    </>
+
+      {/* Bottom Section: Transactions */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="xl:col-span-2">
+          <RecentTransactionsTable />
+        </div>
+        <div className="xl:col-span-1">
+          <RecentTransactionsList />
+        </div>
+      </div>
+    </div>
   );
 };
 
