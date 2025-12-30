@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import { supabase } from "@/lib/supabaseClient";
 import VerificationForm from "./_comp/confirm";
 import { useUserStore } from "@/app/store/user_store";
+import { UpdateUserInfo } from "@/components/helpers/user";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -21,6 +22,8 @@ export default function RegisterPage() {
   const [mode, setMode] = useState<"signin" | "signup" | "verification">(
     "signin"
   );
+  const [userId, setUserId] = useState<string | null>(null);
+  const { mutateAsync: updateUserInfo } = UpdateUserInfo();
   const [isLoading, setIsLoading] = useState(false);
   // Sign In State
   const [email, setEmail] = useState("");
@@ -131,18 +134,30 @@ export default function RegisterPage() {
     }
     try {
       // Create account
-      const { error: signupError } = await supabase.auth.signUp({
-        email: signUpData.email,
-        password: signUpData.password,
-        options: {
-          data: { name: signUpData.name, image_url: newImageUrl },
-        },
-      });
+      const { error: signupError, data: signUpUserData } =
+        await supabase.auth.signUp({
+          email: signUpData.email,
+          password: signUpData.password,
+          options: {
+            data: { name: signUpData.name, image_url: newImageUrl },
+          },
+        });
+
       if (signupError) {
         toast.error(signupError.message);
         setIsLoading(false);
         return;
       }
+      if (signUpUserData?.user?.id) {
+        await updateUserInfo({
+          userId: signUpUserData.user.id,
+          data: {
+            name: signUpData.name,
+            image_url: newImageUrl,
+          },
+        });
+      }
+      console.log("🚀 ~ handleSignUpSubmit ~ newImageUrl:", newImageUrl);
       toast.success("Sign Up is successful");
       setMode("signin");
     } catch (err) {

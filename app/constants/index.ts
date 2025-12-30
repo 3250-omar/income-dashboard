@@ -47,3 +47,38 @@ export const presentageCategoryColors = {
   Healthcare: "bg-pink-500",
   Other: "bg-gray-500",
 };
+
+export const categoryList = [
+  {
+    label: "Salary",
+    value: "salary",
+  },
+  {
+    label: "Food",
+    value: "food",
+  },
+  {
+    label: "Bills",
+    value: "bills",
+  },
+  {
+    label: "Shopping",
+    value: "shopping",
+  },
+  {
+    label: "Entertainment",
+    value: "entertainment",
+  },
+  {
+    label: "Transportation",
+    value: "transportation",
+  },
+  {
+    label: "Healthcare",
+    value: "healthcare",
+  },
+  {
+    label: "Other",
+    value: "other",
+  },
+];

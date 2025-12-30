@@ -21,13 +21,13 @@ const Home = () => {
       </div>
 
       {/* Bottom Section: Transactions */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         <div className="xl:col-span-2">
           <RecentTransactionsTable />
         </div>
-        <div className="xl:col-span-1">
+        {/* <div className="xl:col-span-1">
           <RecentTransactionsList />
-        </div>
+        </div> */}
       </div>
     </div>
   );

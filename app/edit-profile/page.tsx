@@ -1,18 +1,15 @@
 "use client";
-import { useState, useRef, useEffect, EventHandler } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { uploadImage } from "@/components/helpers/uploadImage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "react-toastify";
-import Image from "next/image";
-import { Camera, Lock, Mail, User } from "lucide-react";
+import { Lock, Mail, User } from "lucide-react";
 import { UpdateUserInfo } from "@/components/helpers/user";
 import { useUserStore } from "@/app/store/user_store";
 import { getUserData } from "@/app/hooks/getUserData";
-import EventEmitter from "events";
 import ProfileImageUpload from "@/components/ui/profileImageUpload";
 
 const EditProfile = () => {
@@ -88,6 +85,7 @@ const EditProfile = () => {
             userData?.image_url !== newImageUrl ? newImageUrl : undefined,
         },
       });
+      toast.success("Profile updated successfully");
     } catch {
       toast.error("Failed to update profile");
     } finally {

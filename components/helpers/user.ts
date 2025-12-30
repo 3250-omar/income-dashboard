@@ -7,7 +7,6 @@ export const deleteUser = async (id: string) => {
   supabase.from("users").delete().eq("id", id);
 };
 
-
 export const UpdateUserInfo = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -34,7 +33,6 @@ export const UpdateUserInfo = () => {
     onSuccess: (updatedUser) => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       useUserStore.getState().setSessionUserData(updatedUser);
-      toast.success("Profile updated successfully");
     },
   });
 };
