@@ -1,4 +1,5 @@
 import CategorySelector from "@/app/_comp/selectors/categorySelector";
+import { useUpdateTransaction } from "@/components/helpers/useUpdateTransaction";
 import { Transaction } from "@/types/transaction";
 import { Form, Input, InputNumber, Modal, Select } from "antd";
 import { useEffect } from "react";
@@ -7,21 +8,31 @@ const { Item } = Form;
 const EditTransactionModal = ({
   isModal,
   setIsModal,
-  onFinish,
 }: {
   isModal: { open: boolean; record: Transaction };
   setIsModal: (value: { open: boolean; record: Transaction }) => void;
-  onFinish: () => void;
 }) => {
   const [form] = Form.useForm();
+  const { mutateAsync: updateTransaction } = useUpdateTransaction();
+
   useEffect(() => {
     if (isModal.open) {
       form.setFieldsValue(isModal.record);
     }
   }, [isModal.open, isModal.record, form]);
+  const onFinish = async () => {
+    const values = form.getFieldsValue();
+    console.log(values);
+    const sentData = { ...values, id: isModal.record.id };
+    await updateTransaction({ id: isModal.record.id, updates: sentData });
+    setIsModal({
+      open: false,
+      record: {} as Transaction,
+    });
+  };
   return (
     <Modal
-      title="Edit Transaction Info"
+      title={"Edit Transaction Info"}
       open={isModal.open}
       onCancel={() => setIsModal({ open: false, record: {} as Transaction })}
       styles={{
@@ -32,7 +43,13 @@ const EditTransactionModal = ({
       }}
       onOk={onFinish}
     >
-      <Form form={form} layout="vertical">
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{
+          category: "all",
+        }}
+      >
         <Item label="Type" name="type">
           <Select
             options={[
@@ -54,7 +71,7 @@ const EditTransactionModal = ({
           <InputNumber placeholder="Transaction Amount" className="w-full!" />
         </Item>
         <Item label="Category" name="category">
-          <CategorySelector defaultValue={"all"} />
+          <CategorySelector />
         </Item>
         <Item label="Description" name="description">
           <Input.TextArea placeholder="Transaction Description" rows={3} />

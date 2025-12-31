@@ -19,9 +19,8 @@ import {
 import { Transaction, TransactionType } from "@/types/transaction";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDeleteTransaction } from "../helpers/useDeleteTransaction";
-import { useUpdateTransaction } from "../helpers/useUpdateTransaction";
 import EditTransactionModal from "./_comp/editTransactionModal.tsx";
 
 export function RecentTransactionsTable() {
@@ -35,19 +34,12 @@ export function RecentTransactionsTable() {
     record: {} as Transaction,
   });
   const { mutateAsync: deleteTransaction } = useDeleteTransaction();
-  const { mutateAsync: updateTransaction } = useUpdateTransaction();
-  console.log("🚀 ~ RecentTransactionsTable ~ isModal:", isModal);
   const { data: transactions, isLoading } = useTransactions({
     userId: sessionUserData?.id,
     enabled: !!sessionUserData?.id,
     type: filter === "all" ? undefined : filter,
   });
-  const [form] = Form.useForm();
-  useEffect(() => {
-    if (isModal.open) {
-      form.setFieldsValue(isModal.record);
-    }
-  }, [isModal.open, isModal.record, form]);
+
   const selectOptions = [
     {
       label: "All",
@@ -127,16 +119,6 @@ export function RecentTransactionsTable() {
     },
   ];
 
-  const onFinish = async () => {
-    const values = form.getFieldsValue();
-    console.log(values);
-    const sentData = { ...values, id: isModal.record.id };
-    await updateTransaction({ id: isModal.record.id, updates: sentData });
-    setIsModal({
-      open: false,
-      record: {} as Transaction,
-    });
-  };
   return (
     <Card className="border-none shadow-sm bg-white rounded-2xl">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -148,7 +130,7 @@ export function RecentTransactionsTable() {
             options={selectOptions}
             placeholder="Filter"
             prefix={<Filter color="gray" />}
-            allowClear
+            // allowClear
             onChange={(value) => setFilter(value)}
             value={filter}
             className="w-[150px] h-[40px] "
@@ -163,11 +145,7 @@ export function RecentTransactionsTable() {
           loading={isLoading}
         />
       </CardContent>
-      <EditTransactionModal
-        isModal={isModal}
-        setIsModal={setIsModal}
-        onFinish={onFinish}
-      />
+      <EditTransactionModal isModal={isModal} setIsModal={setIsModal} />
     </Card>
   );
 }

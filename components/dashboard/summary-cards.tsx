@@ -21,14 +21,14 @@ export function SummaryCards() {
       color: "text-slate-900",
     },
     {
-      title: "Monthly Income",
+      title: "Total Income",
       value: `$${data?.income?.toLocaleString() || "0"}`,
       change: "+ 8%",
       changeType: "up",
       color: "text-slate-900",
     },
     {
-      title: "Monthly Expenses",
+      title: "Total Expenses",
       value: `$${data?.expenses?.toLocaleString() || "0"}`,
       change: "- 3%",
       changeType: "down",

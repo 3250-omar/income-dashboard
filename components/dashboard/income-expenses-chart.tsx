@@ -17,6 +17,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
+import { memo } from "react";
 
 const data = [
   { name: "Apr 1", income: 2500, expenses: 1500, trend: 2200 },
@@ -41,7 +42,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function IncomeExpensesChart() {
+const IncomeExpensesChart = () => {
   return (
     <Card className="border-none shadow-sm bg-white rounded-2xl">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -133,4 +134,6 @@ export function IncomeExpensesChart() {
       </CardContent>
     </Card>
   );
-}
+};
+
+export default memo(IncomeExpensesChart);

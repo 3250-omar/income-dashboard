@@ -9,4 +9,5 @@ export interface Transaction {
   description?: string;
   date: string;
   created_at: string;
+  otherCategory?: string;
 }

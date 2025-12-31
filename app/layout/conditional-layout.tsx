@@ -4,14 +4,8 @@ import { useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import SideBar from "@/components/sideBar";
 import { useUserStore } from "../store/user_store";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import FormContainer from "@/components/reusableComponents/Form";
 import TopHeader from "@/components/dashboard/header";
+import AddTransactionModal from "../_comp/modals/addTransactionModal";
 
 export default function ConditionalLayout({
   children,
@@ -21,7 +15,6 @@ export default function ConditionalLayout({
   const router = useRouter();
   const pathname = usePathname();
   const setUser = useUserStore((state) => state.setSessionUserData);
-  const { dialogIsOpen, setDialogIsOpen } = useUserStore();
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
@@ -33,18 +26,6 @@ export default function ConditionalLayout({
       console.log("🚀 ~ ConditionalLayout ~ sessionUserData:", sessionUserData);
       if (!sessionUserData) return;
       setUser(sessionUserData);
-
-      // try {
-      //   await supabase
-      //     .from("users")
-      //     .update({
-      //       name: sessionUserData.user_metadata?.name,
-      //       image_url: sessionUserData.user_metadata?.image_url,
-      //     })
-      //     .eq("id", sessionUserData.id);
-      // } catch (error) {
-      //   console.error("Error updating user data:", error);
-      // }
     });
   }, [setUser, router]);
 
@@ -61,19 +42,7 @@ export default function ConditionalLayout({
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
-      <Dialog
-        open={dialogIsOpen}
-        onOpenChange={(open) => {
-          setDialogIsOpen(open);
-        }}
-      >
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Transaction</DialogTitle>
-          </DialogHeader>
-          <FormContainer />
-        </DialogContent>
-      </Dialog>
+      <AddTransactionModal />
     </div>
   );
 }

@@ -37,9 +37,9 @@ const NavigationComp = ({ setIsSidebarOpen }: NavifationCompProps) => {
       </nav>
 
       {/* Settings at bottom */}
-      <div className="p-4 border-t border-slate-100">
+      {/* <div className="p-4 border-t border-slate-100">
         <DropdownMenuDemo />
-      </div>
+      </div> */}
     </div>
   );
 };

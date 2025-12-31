@@ -1,9 +1,8 @@
+"use client";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
-import { IncomeExpensesChart } from "@/components/dashboard/income-expenses-chart";
 import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
 import { RecentTransactionsTable } from "@/components/dashboard/recent-transactions-table";
-import { RecentTransactionsList } from "@/components/dashboard/recent-transactions-list";
-
+import IncomeExpensesChart from "@/components/dashboard/income-expenses-chart";
 const Home = () => {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

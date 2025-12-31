@@ -1,7 +1,6 @@
 import {
   Banknote,
   Car,
-  ClipboardList,
   DollarSign,
   Film,
   Heart,
@@ -19,11 +18,11 @@ import {
 
 export const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Transactions", href: "/transactions", icon: ClipboardList },
-  { name: "Budgets", href: "/budgets", icon: PiggyBank },
-  { name: "Reports", href: "/reports", icon: Banknote },
-  { name: "Accounts", href: "/accounts", icon: Wallet },
+  // { name: "Transactions", href: "/transactions", icon: ClipboardList },
+  // { name: "Budgets", href: "/budget", icon: PiggyBank },
   { name: "Goals", href: "/goals", icon: Target },
+  { name: "Accounts", href: "/accounts", icon: Wallet },
+  { name: "Reports", href: "/reports", icon: Banknote },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -53,6 +52,52 @@ export const categoryList = [
     label: "Salary",
     value: "salary",
   },
+  {
+    label: "Food",
+    value: "food",
+  },
+  {
+    label: "Bills",
+    value: "bills",
+  },
+  {
+    label: "Shopping",
+    value: "shopping",
+  },
+  {
+    label: "Entertainment",
+    value: "entertainment",
+  },
+  {
+    label: "Transportation",
+    value: "transportation",
+  },
+  {
+    label: "Healthcare",
+    value: "healthcare",
+  },
+  {
+    label: "Other",
+    value: "other",
+  },
+];
+
+export const incomeCategories = [
+  {
+    label: "Salary",
+    value: "salary",
+  },
+  {
+    label: "Freelance",
+    value: "freelance",
+  },
+  {
+    label: "Business",
+    value: "business",
+  },
+];
+
+export const expenseCategories = [
   {
     label: "Food",
     value: "food",
