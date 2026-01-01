@@ -7,7 +7,16 @@ import {
   PlusCircleOutlined,
   RocketOutlined,
 } from "@ant-design/icons";
+import { useGetGoals } from "@/components/helpers/useGetGoals";
+import { useCreateGoal } from "@/components/helpers/useCreateGoal";
 const { List, Item } = Form;
+
+interface DBGoal {
+  goal: string;
+  completed?: boolean;
+  sub_items?: SubItem[];
+  month?: number;
+}
 
 interface SubItem {
   name: string;
@@ -15,7 +24,7 @@ interface SubItem {
 }
 
 interface GoalItem {
-  name: string;
+  goal: string;
   completed: boolean;
   subItems: SubItem[];
 }
@@ -25,10 +34,39 @@ interface FormValues {
 }
 
 const Goals = () => {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [form] = Form.useForm<FormValues>();
+  const { data: goals } = useGetGoals();
+  const { mutateAsync: createGoal } = useCreateGoal();
+
+  React.useEffect(() => {
+    if (goals && (goals as DBGoal[]).length > 0) {
+      const mappedGoals = (goals as DBGoal[]).map((g) => ({
+        goal: g.goal,
+        completed: g.completed || false,
+        subItems: g.sub_items || [],
+      }));
+      form.setFieldsValue({ goals: mappedGoals });
+    }
+  }, [goals, form]);
 
   const onFinish = (values: FormValues) => {
     console.log("Saving Goals:", values);
+    const currentMonth = new Date().getMonth() + 1;
+
+    values.goals.forEach((item) => {
+      if (item.goal.trim()) {
+        createGoal({
+          month: currentMonth,
+          goal: item.goal,
+        });
+      }
+    });
   };
 
   // --- Helper Functions ---
@@ -88,6 +126,8 @@ const Goals = () => {
 
   // --- Progress Logic ---
 
+  if (!mounted) return null;
+
   return (
     <div className="max-w-4xl mx-auto p-6 flex flex-col gap-10">
       {/* Header Section */}
@@ -104,7 +144,7 @@ const Goals = () => {
         </p>
 
         {/* Dynamic Progress Bar */}
-        <Item noStyle shouldUpdate>
+        {/* <Item noStyle shouldUpdate>
           {() => {
             const goals = (form.getFieldValue("goals") as GoalItem[]) || [];
             if (goals.length === 0) return null;
@@ -122,7 +162,7 @@ const Goals = () => {
             );
             const percent =
               Math.round((completedItems / totalItems) * 100) || 0;
-
+          
             return (
               <div className="mt-4">
                 <div className="flex justify-between items-center mb-2">
@@ -146,7 +186,7 @@ const Goals = () => {
               </div>
             );
           }}
-        </Item>
+        </Item> */}
       </div>
 
       <div className="w-full">
@@ -154,7 +194,7 @@ const Goals = () => {
           form={form}
           onFinish={onFinish}
           initialValues={{
-            goals: [{ name: "", completed: false, subItems: [] }],
+            goals: [{ goal: "", completed: false, subItems: [] }],
           }}
           layout="vertical"
         >
@@ -171,7 +211,7 @@ const Goals = () => {
                     (f) => goals[f.name]?.completed
                   );
                   const hasEmptyActive = activeGoals.some(
-                    (f) => !goals[f.name]?.name?.trim()
+                    (f) => !goals[f.name]?.goal?.trim()
                   );
 
                   return (
@@ -212,7 +252,7 @@ const Goals = () => {
                           <div className="flex flex-col gap-4">
                             {activeGoals.map((field) => {
                               const task = goals[field.name];
-                              const isEmpty = !task?.name?.trim();
+                              const isEmpty = !task?.goal?.trim();
 
                               return (
                                 <div
@@ -229,7 +269,7 @@ const Goals = () => {
                                       disabled={isEmpty}
                                       className="scale-125 ml-2"
                                     />
-                                    <Item name={[field.name, "name"]} noStyle>
+                                    <Item name={[field.name, "goal"]} noStyle>
                                       <Input
                                         id={`task-input-${field.key}`}
                                         variant="borderless"
@@ -256,6 +296,7 @@ const Goals = () => {
                                             <CheckOutlined className="text-green-500" />
                                           }
                                           disabled={isEmpty}
+                                          onClick={() => form.submit()}
                                         />
                                       </Tooltip>
                                       <Tooltip title="Delete">
@@ -294,7 +335,13 @@ const Goals = () => {
                                                 id={`subtask-input-${field.name}-${sIdx}`}
                                                 value={sub.name}
                                                 onChange={(e) => {
-                                                  const newGoals = [...goals];
+                                                  const currentGoals =
+                                                    (form.getFieldValue(
+                                                      "goals"
+                                                    ) as GoalItem[]) || [];
+                                                  const newGoals = [
+                                                    ...currentGoals,
+                                                  ];
                                                   newGoals[field.name].subItems[
                                                     sIdx
                                                   ].name = e.target.value;
@@ -355,7 +402,7 @@ const Goals = () => {
                                       }
                                     />
                                     <span className="text-lg line-through text-gray-500 flex-1">
-                                      {task.name}
+                                      {task.goal}
                                     </span>
                                     <Button
                                       type="text"
