@@ -45,6 +45,7 @@ export const ChartLineDefault = memo(function ChartLineDefault() {
     userId: sessionUserData?.id,
     enabled: !!sessionUserData?.id,
   });
+  const transactions = data?.transactions || [];
   return (
     <Card>
       <CardHeader>

@@ -16,11 +16,12 @@ export interface Transaction {
 
 export function RecentTransactions() {
   const { sessionUserData } = useUserStore();
-  const { data: transactions } = useTransactions({
+  const { data } = useTransactions({
     userId: sessionUserData?.id,
     enabled: !!sessionUserData?.id,
   });
-  if (!transactions) {
+  const transactions = data?.transactions || [];
+  if (!data) {
     return;
   }
   return (

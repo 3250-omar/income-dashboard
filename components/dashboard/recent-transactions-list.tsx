@@ -50,10 +50,12 @@ const getIcon = (category: string) => {
 
 export function RecentTransactionsList() {
   const { sessionUserData } = useUserStore();
-  const { data: transactions } = useTransactions({
+  const { data } = useTransactions({
     userId: sessionUserData?.id,
     enabled: !!sessionUserData?.id,
   });
+
+  const transactions = data?.transactions || [];
 
   return (
     <Card className="border-none shadow-sm bg-white rounded-2xl h-full">
@@ -64,7 +66,7 @@ export function RecentTransactionsList() {
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {transactions?.slice(0, 4).map((tx: Transaction) => (
+          {transactions.slice(0, 4).map((tx: Transaction) => (
             <div
               key={tx.id}
               className="flex items-center justify-between group cursor-pointer"
@@ -92,7 +94,7 @@ export function RecentTransactionsList() {
               </div>
             </div>
           ))}
-          {!transactions?.length && (
+          {!transactions.length && (
             <p className="py-6 text-center text-slate-400 font-bold">
               No transactions
             </p>

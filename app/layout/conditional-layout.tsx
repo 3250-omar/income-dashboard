@@ -17,18 +17,27 @@ export default function ConditionalLayout({
   const setUser = useUserStore((state) => state.setSessionUserData);
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) {
+    supabase.auth.getSession().then(async ({ data }) => {
+      console.log("🚀 ~ ConditionalLayout ~ data:", data);
+      if (!data) {
         router.push("/sign-in");
         return;
       }
-      const sessionUserData = data?.user;
+      const sessionUserData = data?.session?.user;
       console.log("🚀 ~ ConditionalLayout ~ sessionUserData:", sessionUserData);
       if (!sessionUserData) return;
       setUser(sessionUserData);
     });
   }, [setUser, router]);
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      useUserStore.getState().setSessionUserData(session?.user ?? null);
+    });
 
+    return () => subscription.unsubscribe();
+  }, []);
   if (pathname.includes("sign-in")) {
     return <div className="min-h-screen bg-slate-50">{children}</div>;
   }

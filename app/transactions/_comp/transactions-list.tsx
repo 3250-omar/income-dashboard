@@ -8,17 +8,10 @@ import { categoryIcons } from "@/app/constants";
 import { useUpdateTransaction } from "@/components/helpers/useUpdateTransaction";
 import { useUserStore } from "@/app/store/user_store";
 
-type Transaction = {
-  id: number;
-  type: "income" | "expense";
-  category: string;
-  amount: number;
-  description: string;
-  date: string;
-};
+import { Transaction } from "@/types/transaction";
 
 interface TransactionsListProps {
-  setEditingTransaction: (transaction: Transaction | null) => void;
+  setEditingTransaction: (transaction: any | null) => void;
 }
 
 export default function TransactionsList({
@@ -29,6 +22,7 @@ export default function TransactionsList({
     userId: sessionUserData?.id,
     enabled: !!sessionUserData?.id,
   });
+  const transactions = data?.transactions || [];
   const { setDialogIsOpen } = useUserStore();
   const { mutate } = useDeleteTransaction();
   const { mutate: updateTransaction } = useUpdateTransaction();
@@ -44,13 +38,13 @@ export default function TransactionsList({
         <CardTitle>All Transactions</CardTitle>
       </CardHeader>
       <CardContent>
-        {data?.length === 0 ? (
+        {transactions.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <p>No transactions yet. Add your first transaction!</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {data?.map((transaction) => {
+            {transactions.map((transaction) => {
               const Icon =
                 categoryIcons[
                   transaction.category as keyof typeof categoryIcons

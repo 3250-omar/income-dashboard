@@ -34,11 +34,23 @@ export function RecentTransactionsTable() {
     record: {} as Transaction,
   });
   const { mutateAsync: deleteTransaction } = useDeleteTransaction();
-  const { data: transactions, isLoading } = useTransactions({
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
+  console.log("🚀 ~ RecentTransactionsTable ~ pagination:", pagination);
+
+  const { data, isLoading } = useTransactions({
     userId: sessionUserData?.id,
     enabled: !!sessionUserData?.id,
     type: filter === "all" ? undefined : filter,
+    page: pagination.current - 1,
+    pageSize: pagination.pageSize,
   });
+
+  const transactions = data?.transactions || [];
+  const totalCount = data?.count || 0;
+
+  const handleTableChange = (pagination: any) => {
+    setPagination(pagination);
+  };
 
   const selectOptions = [
     {
@@ -131,7 +143,10 @@ export function RecentTransactionsTable() {
             placeholder="Filter"
             prefix={<Filter color="gray" />}
             // allowClear
-            onChange={(value) => setFilter(value)}
+            onChange={(value) => {
+              setFilter(value);
+              setPagination({ ...pagination, current: 1 });
+            }}
             value={filter}
             className="w-[150px] h-[40px] "
           />
@@ -143,6 +158,13 @@ export function RecentTransactionsTable() {
           dataSource={transactions}
           rowKey="id"
           loading={isLoading}
+          onChange={handleTableChange}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: totalCount,
+            showSizeChanger: true,
+          }}
         />
       </CardContent>
       <EditTransactionModal isModal={isModal} setIsModal={setIsModal} />

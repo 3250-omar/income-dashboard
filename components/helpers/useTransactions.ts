@@ -6,18 +6,25 @@ export const useTransactions = ({
   type,
   enabled,
   userId,
+  page,
+  pageSize,
 }: {
   type?: "income" | "expense";
   enabled?: boolean;
   userId?: string;
+  page?: number;
+  pageSize?: number;
 }) => {
   return useQuery({
-    queryKey: ["transactions", type],
+    queryKey: ["transactions", type, userId, page, pageSize],
     enabled,
-    queryFn: async (): Promise<Transaction[]> => {
+    queryFn: async (): Promise<{
+      transactions: Transaction[];
+      count: number | null;
+    }> => {
       let query = supabase
         .from("transactions")
-        .select("*")
+        .select("*", { count: "exact" })
         .order("date", { ascending: false });
 
       if (type) {
@@ -26,10 +33,20 @@ export const useTransactions = ({
       if (userId) {
         query = query.eq("user_id", userId);
       }
-      const { data, error } = await query;
+
+      if (page !== undefined && pageSize !== undefined) {
+        const from = page * pageSize;
+        const to = from + pageSize - 1;
+        query = query.range(from, to);
+      }
+
+      const { data, error, count } = await query;
       if (error) throw error;
 
-      return data;
+      return {
+        transactions: (data as Transaction[]) || [],
+        count: count,
+      };
     },
     staleTime: 1000 * 60 * 5, //   5 minutes
   });

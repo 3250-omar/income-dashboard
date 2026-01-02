@@ -3,6 +3,7 @@ import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
 import { RecentTransactionsTable } from "@/components/dashboard/recent-transactions-table";
 import IncomeExpensesChart from "@/components/dashboard/income-expenses-chart";
+import CurrentMonthGoals from "./_comp/dashboard/currentMonthGoals";
 const Home = () => {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -15,7 +16,8 @@ const Home = () => {
           <IncomeExpensesChart />
         </div>
         <div className="xl:col-span-1">
-          <ExpenseBreakdown />
+          {/* <ExpenseBreakdown /> */}
+          <CurrentMonthGoals />
         </div>
       </div>
 
