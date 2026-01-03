@@ -6,6 +6,7 @@ import SideBar from "@/components/sideBar";
 import { useUserStore } from "../store/user_store";
 import TopHeader from "@/components/dashboard/header";
 import AddTransactionModal from "../_comp/modals/addTransactionModal";
+import AddGoalModal from "../_comp/modals/AddGoalModal";
 
 export default function ConditionalLayout({
   children,
@@ -17,27 +18,55 @@ export default function ConditionalLayout({
   const setUser = useUserStore((state) => state.setSessionUserData);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      console.log("🚀 ~ ConditionalLayout ~ data:", data);
-      if (!data) {
-        router.push("/sign-in");
+    // Initial session check
+    const checkSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error || !data.session) {
+        if (!pathname.includes("sign-in")) {
+          router.push("/sign-in");
+        }
         return;
       }
-      const sessionUserData = data?.session?.user;
-      console.log("🚀 ~ ConditionalLayout ~ sessionUserData:", sessionUserData);
-      if (!sessionUserData) return;
-      setUser(sessionUserData);
-    });
-  }, [setUser, router]);
-  useEffect(() => {
+      setUser(data.session.user);
+    };
+
+    checkSession();
+
+    // Listen for auth state changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      useUserStore.getState().setSessionUserData(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth event:", event);
+      setUser(session?.user ?? null);
+      if (event === "SIGNED_OUT") {
+        router.push("/sign-in");
+      }
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    // Proactively refresh session on tab visibility change
+    // This helps avoid "JWT expired" errors after long periods of inactivity
+    // const handleVisibilityChange = async () => {
+    //   if (document.visibilityState === "visible") {
+    //     console.log("Tab visible: Refreshing session...");
+    //     const { data, error } = await supabase.auth.getSession();
+    //     if (error) {
+    //       console.error(
+    //         "Error refreshing session on visibility change:",
+    //         error
+    //       );
+    //     } else if (data.session) {
+    //       setUser(data.session.user);
+    //     }
+    //   }
+    // };
+
+    // document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      subscription.unsubscribe();
+      // document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [setUser, router, pathname]);
   if (pathname.includes("sign-in")) {
     return <div className="min-h-screen bg-slate-50">{children}</div>;
   }
@@ -52,6 +81,7 @@ export default function ConditionalLayout({
         </main>
       </div>
       <AddTransactionModal />
+      <AddGoalModal />
     </div>
   );
 }

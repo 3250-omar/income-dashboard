@@ -1,23 +1,26 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { Form, Empty, Spin } from "antd";
 import { useGetGoals } from "@/components/helpers/useGetGoals";
-import { useCreateGoal } from "@/components/helpers/useCreateGoal";
-import AddGoalModal from "../_comp/modals/AddGoalModal";
+import {
+  useUpdateGoal,
+  useDeleteGoal,
+} from "@/components/helpers/useUpdateGoal";
 import dayjs from "dayjs";
 import { GoalItem as GoalItemType } from "./types";
 import GoalsHeader from "./_comp/GoalsHeader";
 import GoalsFilter from "./_comp/GoalsFilter";
 import GoalGroup from "./_comp/GoalGroup";
-import { Spinner } from "@/components/ui/spinner";
+import { useUserStore } from "../store/user_store";
 
 const { Item } = Form;
 
 interface DBGoal {
+  id: string;
   goal: string;
-  completed?: boolean;
-  sub_items?: any[];
+  status?: boolean;
   month?: number;
+  goal_amount?: number;
 }
 
 interface FormValues {
@@ -26,186 +29,158 @@ interface FormValues {
 }
 
 const Goals = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [listFilterMonth, setListFilterMonth] = useState<number | null>(null);
-
+  const [listFilterStatus, setListFilterStatus] = useState<boolean | null>(
+    null
+  );
+  const setSelectedMonth = useUserStore((state) => state.setSelectedMonth);
   const [form] = Form.useForm<FormValues>();
   const selectedMonthValue = Form.useWatch("month", form);
-  const selectedMonthAdd = selectedMonthValue
-    ? dayjs(selectedMonthValue).month() + 1
-    : null;
 
-  const { data: goals, isLoading } = useGetGoals(listFilterMonth ?? undefined);
+  const selectedMonthAdd = useMemo(
+    () =>
+      selectedMonthValue ? dayjs(selectedMonthValue).month() + 1 : undefined,
+    [selectedMonthValue]
+  );
+
+  const { mutateAsync: updateGoal } = useUpdateGoal();
+  const { mutateAsync: deleteGoal } = useDeleteGoal();
 
   useEffect(() => {
-    if (goals) {
-      const mappedGoals = (goals as DBGoal[]).map((g) => ({
-        goal: g.goal,
-        completed: g.completed || false,
-        subItems: g.sub_items || [],
-        month: g.month || 1,
-      }));
+    setSelectedMonth(selectedMonthAdd);
+  }, [selectedMonthAdd, setSelectedMonth]);
 
-      mappedGoals.sort((a, b) => a.month - b.month);
+  const { data: goals, isLoading } = useGetGoals(
+    listFilterMonth ?? undefined,
+    listFilterStatus ?? undefined
+  );
+
+  // Memoize the mapped and sorted goals to prevent unnecessary recalculations
+  const mappedGoals = useMemo(() => {
+    if (!goals) return [];
+
+    const mapped = (goals as DBGoal[]).map((g) => ({
+      id: g.id,
+      goal: g.goal,
+      status: g.status || false,
+      month: g.month || 1,
+      goal_amount: g.goal_amount,
+    }));
+
+    return mapped.sort((a, b) => a.month - b.month);
+  }, [goals]);
+
+  useEffect(() => {
+    if (mappedGoals.length > 0) {
       form.setFieldsValue({ goals: mappedGoals });
     }
-  }, [goals, form]);
+  }, [mappedGoals, form]);
 
-  const onFinish = (values: FormValues) => {
+  const onFinish = useCallback((values: FormValues) => {
     console.log("Saving Goals:", values);
-  };
+  }, []);
 
-  const disabledDate = (current: dayjs.Dayjs) => {
+  const disabledDate = useCallback((current: dayjs.Dayjs) => {
     return current && current < dayjs().startOf("month");
-  };
-
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
+  }, []);
 
   const toggleComplete = useCallback(
-    (index: number, subIndex?: number) => {
-      const currentGoals =
-        (form.getFieldValue("goals") as GoalItemType[]) || [];
-      const newGoals = [...currentGoals];
-
-      if (subIndex !== undefined) {
-        const subItems = [...(newGoals[index]?.subItems || [])];
-        subItems[subIndex] = {
-          ...subItems[subIndex],
-          completed: !subItems[subIndex]?.completed,
-        };
-        newGoals[index] = { ...newGoals[index], subItems };
-      } else {
-        newGoals[index] = {
-          ...newGoals[index],
-          completed: !newGoals[index]?.completed,
-        };
+    (goal: GoalItemType) => {
+      if (!goal.id) {
+        console.error("Goal ID not found for update:", goal);
+        return;
       }
 
-      form.setFieldsValue({ goals: newGoals });
+      updateGoal({
+        id: goal.id,
+        status: !goal.status,
+      });
     },
-    [form]
+    [updateGoal]
   );
 
-  const addSubItem = useCallback(
-    (parentIndex: number) => {
-      const currentGoals =
-        (form.getFieldValue("goals") as GoalItemType[]) || [];
-      const newGoals = [...currentGoals];
-      const subItems = [...(newGoals[parentIndex]?.subItems || [])];
-      subItems.push({ name: "", completed: false });
-      newGoals[parentIndex] = { ...newGoals[parentIndex], subItems };
-      form.setFieldsValue({ goals: newGoals });
+  const onRemove = useCallback(
+    (goal: GoalItemType) => {
+      if (!goal.id) {
+        console.error("Goal ID not found for deletion:", goal);
+        return;
+      }
 
-      setTimeout(() => {
-        const el = document.getElementById(
-          `subtask-input-${parentIndex}-${subItems.length - 1}`
-        );
-        el?.focus();
-      }, 0);
+      deleteGoal(goal.id);
     },
-    [form]
+    [deleteGoal]
   );
 
-  const removeSubItem = useCallback(
-    (parentIndex: number, subIndex: number) => {
-      const currentGoals =
-        (form.getFieldValue("goals") as GoalItemType[]) || [];
-      const newGoals = [...currentGoals];
-      const subItems = [...(newGoals[parentIndex]?.subItems || [])];
-      subItems.splice(subIndex, 1);
-      newGoals[parentIndex] = { ...newGoals[parentIndex], subItems };
-      form.setFieldsValue({ goals: newGoals });
-    },
-    [form]
-  );
+  const handleFilterChange = useCallback((date: dayjs.Dayjs | null) => {
+    setListFilterMonth(date ? date.month() + 1 : null);
+  }, []);
 
-  const handleSubItemNameChange = useCallback(
-    (parentIndex: number, subIndex: number, value: string) => {
-      const currentGoals =
-        (form.getFieldValue("goals") as GoalItemType[]) || [];
-      const newGoals = [...currentGoals];
-      newGoals[parentIndex].subItems[subIndex].name = value;
-      form.setFieldsValue({ goals: newGoals });
-    },
-    [form]
-  );
+  const handleStatusChange = useCallback((status: boolean | null) => {
+    setListFilterStatus(status);
+  }, []);
 
   return (
     <Form form={form} onFinish={onFinish} layout="vertical">
       <div className="max-w-4xl mx-auto p-6 flex flex-col gap-10">
-        <GoalsHeader
-          selectedMonthAdd={selectedMonthAdd}
-          onAddClick={showModal}
-          disabledDate={disabledDate}
-        />
+        <GoalsHeader disabledDate={disabledDate} />
 
         <div className="w-full flex flex-col gap-6">
           <GoalsFilter
             listFilterMonth={listFilterMonth}
-            onFilterChange={(date) =>
-              setListFilterMonth(date ? date.month() + 1 : null)
-            }
+            onFilterChange={handleFilterChange}
+            listFilterStatus={listFilterStatus}
+            onStatusChange={handleStatusChange}
           />
 
           <div className="w-full">
-            <Item noStyle shouldUpdate>
-              {() => (
-                <Form.List name="goals">
-                  {(fields, { remove }) => {
-                    const currentGoals =
-                      (form.getFieldValue("goals") as GoalItemType[]) || [];
+            {isLoading ? (
+              <div className="flex justify-center p-20">
+                <Spin size="large" />
+              </div>
+            ) : (
+              <Form.List name="goals">
+                {(fields) => {
+                  const goalsValues = form.getFieldValue("goals") || [];
+                  const hasGoals = fields.length > 0;
 
-                    const groups: Record<number, typeof fields> = {};
-                    fields.forEach((field) => {
-                      const m = currentGoals[field.name]?.month || 0;
-                      if (!groups[m]) groups[m] = [];
-                      groups[m].push(field);
-                    });
-
-                    const sortedMonths = Object.keys(groups)
-                      .map(Number)
-                      .sort((a, b) => a - b);
-
-                    if (sortedMonths.length === 0) {
-                      return (
-                        <div className="bg-gray-50 rounded-2xl p-10 border-2 border-dashed border-gray-200">
-                          <Empty description="No goals found." />
-                        </div>
-                      );
-                    }
-
+                  if (!hasGoals) {
                     return (
-                      <div className="flex flex-col gap-12">
-                        {sortedMonths.map((mValue) => (
-                          <GoalGroup
-                            key={mValue}
-                            mValue={mValue}
-                            monthFields={groups[mValue]}
-                            currentGoals={currentGoals}
-                            onToggleComplete={toggleComplete}
-                            onAddSubItem={addSubItem}
-                            onRemoveSubItem={removeSubItem}
-                            onRemove={remove}
-                            onSubItemNameChange={handleSubItemNameChange}
-                          />
-                        ))}
+                      <div className="bg-gray-50 rounded-2xl p-10 border-2 border-dashed border-gray-200">
+                        <Empty description="No goals found." />
                       </div>
                     );
-                  }}
-                </Form.List>
-              )}
-            </Item>
+                  }
+
+                  // Group fields by month for better performance
+                  const fieldsByMonth = fields.reduce((acc, field) => {
+                    const month = goalsValues[field.name]?.month || 0;
+                    if (!acc[month]) acc[month] = [];
+                    acc[month].push(field);
+                    return acc;
+                  }, {} as Record<number, typeof fields>);
+
+                  return (
+                    <div className="flex flex-col gap-12">
+                      {Object.entries(fieldsByMonth)
+                        .sort(([a], [b]) => Number(a) - Number(b))
+                        .map(([mValue, monthFields]) => (
+                          <GoalGroup
+                            key={mValue}
+                            mValue={Number(mValue)}
+                            monthFields={monthFields}
+                            currentGoals={goalsValues}
+                            onToggleComplete={toggleComplete}
+                            onRemove={onRemove}
+                          />
+                        ))}
+                    </div>
+                  );
+                }}
+              </Form.List>
+            )}
           </div>
         </div>
       </div>
-
-      <AddGoalModal
-        isVisible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
-        selectedMonth={selectedMonthAdd}
-      />
     </Form>
   );
 };

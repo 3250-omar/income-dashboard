@@ -71,10 +71,10 @@ export function SummaryCards() {
           </CardContent>
         </Card>
       ))}
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-end ">
         <Button
           onClick={() => setDialogIsOpen(true)}
-          className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-6 h-12 font-bold shadow-lg shadow-emerald-100 transition-all hover:scale-105 active:scale-95"
+          className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-6 h-12 font-bold shadow-lg shadow-emerald-100 transition-all hover:scale-105 active:scale-95 cursor-pointer "
         >
           <Plus className="w-5 h-5 mr-2" />
           Add Transaction

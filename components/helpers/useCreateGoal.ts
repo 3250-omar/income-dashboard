@@ -14,6 +14,7 @@ export const useCreateGoal = () => {
       month: number;
       goal: string;
       goal_amount?: number;
+      status: boolean;
     }) => {
       if (!sessionUserData) throw new Error("Not authenticated");
 

@@ -3,7 +3,6 @@ import type { NextRequest } from "next/server";
 import { supabaseServer } from "./lib/supabaseServer";
 
 export  async function  proxy (request: NextRequest) {
-
   return NextResponse.next();
 }
 

@@ -92,6 +92,11 @@ export function RecentTransactionsTable() {
       title: "Description",
       dataIndex: "description",
       key: "description",
+      render: (value: string) => (
+        <span className="max-w-[250] truncate">
+          {value || "No Description Provided"}
+        </span>
+      ),
     },
     {
       title: "Category",

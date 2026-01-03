@@ -1,8 +1,9 @@
-"use client";
-import React from "react";
-import { Form, Checkbox, Input, Tooltip, Button } from "antd";
-import { PlusCircleOutlined, DeleteOutlined } from "@ant-design/icons";
+import React, { useCallback, useMemo } from "react";
+import { Form, Checkbox, Input, Tooltip, Button, Popconfirm } from "antd";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { monthStyles } from "@/app/constants";
 import { GoalItem as GoalItemType } from "../types";
+import { useUserStore } from "@/app/store/user_store";
 
 const { Item } = Form;
 
@@ -10,110 +11,132 @@ interface GoalItemProps {
   field: {
     name: number;
     key: number;
+    isListField: boolean;
+    fieldKey: number;
     [key: string]: any;
   };
   task: GoalItemType;
-  onToggleComplete: (index: number, subIndex?: number) => void;
-  onAddSubItem: (index: number) => void;
-  onRemoveSubItem: (parentIndex: number, subIndex: number) => void;
-  onRemove: (index: number) => void;
-  onSubItemNameChange: (
-    parentIndex: number,
-    subIndex: number,
-    value: string
-  ) => void;
+  onToggleComplete: (goal: GoalItemType) => void;
+  onRemove: (goal: GoalItemType) => void;
 }
 
-const GoalItem: React.FC<GoalItemProps> = ({
-  field,
-  task,
-  onToggleComplete,
-  onAddSubItem,
-  onRemoveSubItem,
-  onRemove,
-  onSubItemNameChange,
-}) => {
-  const isEmpty = !task?.goal?.trim();
+const GoalItem: React.FC<GoalItemProps> = React.memo(
+  ({ field, task, onToggleComplete, onRemove }) => {
+    const setAddGoalDialog = useUserStore((state) => state.setAddGoalDialog);
+    const setEditingGoal = useUserStore((state) => state.setEditingGoal);
 
-  return (
-    <div className="group flex flex-col bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-      {/* Main Goal Row */}
-      <div className="flex items-center gap-4">
-        <Checkbox
-          checked={task?.completed}
-          onChange={() => onToggleComplete(field.name)}
-          disabled={isEmpty}
-          className="scale-125 ml-2"
-        />
-        <Item name={[field.name, "goal"]} noStyle>
-          <Input
-            variant="borderless"
-            placeholder="What's your goal?"
-            className="text-lg font-medium text-gray-700 px-0 focus:shadow-none"
-          />
+    const isFinished = useMemo(() => task?.status, [task?.status]);
+    const isEmpty = useMemo(() => !task?.goal?.trim(), [task?.goal]);
+    const hasGoalAmount = useMemo(
+      () => task.goal_amount !== undefined && task.goal_amount !== null,
+      [task.goal_amount]
+    );
+
+    const handleEdit = useCallback(() => {
+      setEditingGoal(task);
+      setAddGoalDialog(true);
+    }, [task, setEditingGoal, setAddGoalDialog]);
+
+    const handleToggle = useCallback(() => {
+      onToggleComplete(task);
+    }, [task, onToggleComplete]);
+
+    const handleRemove = useCallback(() => {
+      onRemove(task);
+    }, [task, onRemove]);
+
+    const containerClassName = useMemo(
+      () =>
+        `group flex flex-col bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 ${
+          isFinished
+            ? "border-green-100 bg-green-50/20 opacity-75"
+            : "border-gray-100"
+        }`,
+      [isFinished]
+    );
+
+    const inputClassName = useMemo(
+      () =>
+        `text-lg font-medium px-0 focus:shadow-none p-0 h-auto ${
+          isFinished ? "text-gray-400 line-through" : "text-gray-800"
+        }`,
+      [isFinished]
+    );
+
+    return (
+      <div className={containerClassName}>
+        {/* Hidden ID Field */}
+        <Item name={[field.name, "id"]} hidden>
+          <Input />
         </Item>
 
-        <div className="flex items-center gap-1 ">
-          <Tooltip title="Add sub-task">
-            <Button
-              type="text"
-              icon={<PlusCircleOutlined className="text-blue-400" />}
-              onClick={() => onAddSubItem(field.name)}
+        {/* Main Goal Row */}
+        <div className="flex items-center gap-4">
+          <Item name={[field.name, "status"]} valuePropName="checked" noStyle>
+            <Checkbox
+              onChange={handleToggle}
               disabled={isEmpty}
+              className="scale-125 ml-2"
             />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button
-              type="text"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => onRemove(field.name)}
-            />
-          </Tooltip>
-        </div>
-      </div>
-
-      {/* Sub-Items List */}
-      {task?.subItems && task.subItems.length > 0 && (
-        <div className="ml-10 mt-3 pl-4 border-l-2 border-gray-100 flex flex-col gap-3">
-          {task.subItems.map((sub, sIdx) => {
-            const subEmpty = !sub.name?.trim();
-            return (
-              <div
-                key={`${field.key}-sub-${sIdx}`}
-                className="flex items-center gap-3"
-              >
-                <Checkbox
-                  checked={sub.completed}
-                  onChange={() => onToggleComplete(field.name, sIdx)}
-                  disabled={subEmpty}
-                />
+          </Item>
+          <div className="flex-1 flex gap-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-wide w-12">
+                Goal:
+              </span>
+              <Item name={[field.name, "goal"]} noStyle>
                 <Input
-                  id={`subtask-input-${field.name}-${sIdx}`}
-                  value={sub.name}
-                  onChange={(e) =>
-                    onSubItemNameChange(field.name, sIdx, e.target.value)
-                  }
                   variant="borderless"
-                  placeholder="Task detail..."
-                  className="text-gray-600 px-0 text-sm py-1"
+                  placeholder="What's your goal?"
+                  className={inputClassName}
+                  readOnly
                 />
+              </Item>
+            </div>
+            {hasGoalAmount && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wide w-12">
+                  Target:
+                </span>
+                <span className="text-sm font-semibold text-gray-600">
+                  ${task.goal_amount}
+                </span>
+              </div>
+            )}
+          </div>
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1">
+            <Tooltip title="Edit">
+              <Button
+                type="text"
+                icon={<EditOutlined />}
+                onClick={handleEdit}
+                className="opacity-0 group-hover:opacity-100 transition-opacity text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+              />
+            </Tooltip>
+            <Popconfirm
+              title="Delete the goal"
+              description="Are you sure to delete this goal?"
+              onConfirm={handleRemove}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Tooltip title="Delete">
                 <Button
                   type="text"
-                  size="small"
                   danger
-                  icon={
-                    <DeleteOutlined className="text-gray-300 hover:text-red-500" />
-                  }
-                  onClick={() => onRemoveSubItem(field.name, sIdx)}
+                  icon={<DeleteOutlined />}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity"
                 />
-              </div>
-            );
-          })}
+              </Tooltip>
+            </Popconfirm>
+          </div>
         </div>
-      )}
-    </div>
-  );
-};
+      </div>
+    );
+  }
+);
+
+GoalItem.displayName = "GoalItem";
 
 export default GoalItem;

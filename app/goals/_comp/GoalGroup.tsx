@@ -1,117 +1,102 @@
 "use client";
-import React from "react";
-import dayjs from "dayjs";
-import { Checkbox, Button } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import React, { useMemo } from "react";
+import { Collapse } from "antd";
 import { monthStyles } from "@/app/constants";
 import { GoalItem as GoalItemType } from "../types";
 import GoalItem from "./GoalItem";
+import MonthHeader from "./MonthHeader";
 
 interface GoalGroupProps {
   mValue: number;
   monthFields: any[];
   currentGoals: GoalItemType[];
-  onToggleComplete: (index: number, subIndex?: number) => void;
-  onAddSubItem: (index: number) => void;
-  onRemoveSubItem: (parentIndex: number, subIndex: number) => void;
-  onRemove: (index: number) => void;
-  onSubItemNameChange: (
-    parentIndex: number,
-    subIndex: number,
-    value: string
-  ) => void;
+  onToggleComplete: (goal: GoalItemType) => void;
+  onRemove: (goal: GoalItemType) => void;
 }
 
-const GoalGroup: React.FC<GoalGroupProps> = ({
-  mValue,
-  monthFields,
-  currentGoals,
-  onToggleComplete,
-  onAddSubItem,
-  onRemoveSubItem,
-  onRemove,
-  onSubItemNameChange,
-}) => {
-  const activeInMonth = monthFields.filter(
-    (f) => !currentGoals[f.name]?.completed
-  );
-  const completedInMonth = monthFields.filter(
-    (f) => currentGoals[f.name]?.completed
-  );
+const GoalGroup: React.FC<GoalGroupProps> = React.memo(
+  ({ mValue, monthFields, currentGoals, onToggleComplete, onRemove }) => {
+    const activeInMonth = useMemo(
+      () => monthFields.filter((f) => !currentGoals[f.name]?.status),
+      [monthFields, currentGoals]
+    );
 
-  const style = monthStyles[mValue] || {
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-    icon: null,
-  };
-  const Icon = style.icon;
+    const completedInMonth = useMemo(
+      () => monthFields.filter((f) => currentGoals[f.name]?.status),
+      [monthFields, currentGoals]
+    );
 
-  return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center gap-4">
-        <div
-          className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm uppercase tracking-wider border border-transparent shadow-sm ${style.bg} ${style.color}`}
-        >
-          {Icon && <Icon size={16} />}
-          {dayjs()
-            .month(mValue - 1)
-            .format("MMMM")}
-        </div>
-        <div className="h-px bg-gray-100 flex-1"></div>
-      </div>
+    const style = monthStyles[mValue] || {
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+      icon: null,
+    };
 
-      {/* Active Tasks Section */}
-      <div className="flex flex-col gap-6">
-        {activeInMonth.length > 0 && (
-          <div className="flex flex-col gap-4">
-            {activeInMonth.map((field) => (
-              <GoalItem
-                key={field.key}
-                field={field}
-                task={currentGoals[field.name]}
-                onToggleComplete={onToggleComplete}
-                onAddSubItem={onAddSubItem}
-                onRemoveSubItem={onRemoveSubItem}
-                onRemove={onRemove}
-                onSubItemNameChange={onSubItemNameChange}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+    return (
+      <Collapse
+        defaultActiveKey={[mValue]}
+        className="bg-transparent! [&_.ant-collapse-header]:bg-gray-50! [&_.ant-collapse-header]:hover:bg-gray-100! [&_.ant-collapse-header]:transition-colors! "
+        expandIconPlacement="end"
+        items={[
+          {
+            key: mValue,
+            label: <MonthHeader mValue={mValue} style={style} />,
+            children: (
+              <div className="flex flex-col gap-8 pt-4">
+                {/* Active Goals Section */}
+                {activeInMonth.length > 0 && (
+                  <div className="flex flex-col gap-6">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-bold text-blue-400 uppercase tracking-widest pl-2">
+                        Pending · {activeInMonth.length}
+                      </span>
+                      <div className="h-px bg-blue-50 flex-1"></div>
+                    </div>
+                    <div className="flex flex-col gap-4">
+                      {activeInMonth.map((field) => (
+                        <GoalItem
+                          key={field.key}
+                          field={field}
+                          task={currentGoals[field.name]}
+                          onToggleComplete={onToggleComplete}
+                          onRemove={onRemove}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-      {/* Completed Section */}
-      {completedInMonth.length > 0 && (
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-3 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-            {completedInMonth.map((field) => {
-              const task = currentGoals[field.name];
-              return (
-                <div
-                  key={field.key}
-                  className="flex items-center gap-4 bg-gray-50/50 rounded-xl p-4 border border-transparent hover:border-gray-200 transition-all"
-                >
-                  <Checkbox
-                    checked={task.completed}
-                    onChange={() => onToggleComplete(field.name)}
-                  />
-                  <span className="text-lg line-through text-gray-500 flex-1">
-                    {task.goal}
-                  </span>
-                  <Button
-                    type="text"
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={() => onRemove(field.name)}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+                {/* Completed Goals Section */}
+                {completedInMonth.length > 0 && (
+                  <div className="flex flex-col gap-6">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-bold text-green-500 uppercase tracking-widest pl-2">
+                        Completed · {completedInMonth.length}
+                      </span>
+                      <div className="h-px bg-green-50 flex-1"></div>
+                    </div>
+                    <div className="flex flex-col gap-4 transition-all duration-500">
+                      {completedInMonth.map((field) => (
+                        <GoalItem
+                          key={field.key}
+                          field={field}
+                          task={currentGoals[field.name]}
+                          onToggleComplete={onToggleComplete}
+                          onRemove={onRemove}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ),
+          },
+        ]}
+      />
+    );
+  }
+);
+
+GoalGroup.displayName = "GoalGroup";
 
 export default GoalGroup;

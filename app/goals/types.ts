@@ -1,11 +1,7 @@
-export interface SubItem {
-  name: string;
-  completed: boolean;
-}
-
 export interface GoalItem {
+  id: string;
   goal: string;
-  completed: boolean;
-  subItems: SubItem[];
+  status: boolean;
   month: number;
+  goal_amount?: number;
 }
