@@ -15,6 +15,7 @@ export const useCreateTransaction = () => {
       category?: string;
       description?: string;
       date: string;
+      account_id?: string;
     }) => {
       if (!sessionUserData) throw new Error("Not authenticated");
 
@@ -30,6 +31,10 @@ export const useCreateTransaction = () => {
       // Invalidate all queries that start with "transactions"
       queryClient.invalidateQueries({
         queryKey: ["transactions"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["accounts"],
         refetchType: "active",
       });
       queryClient.invalidateQueries({ queryKey: ["financial-summary"] });

@@ -7,6 +7,7 @@ import { useUserStore } from "../store/user_store";
 import TopHeader from "@/components/dashboard/header";
 import AddTransactionModal from "../_comp/modals/addTransactionModal";
 import AddGoalModal from "../_comp/modals/AddGoalModal";
+import AddAccountModal from "../_comp/modals/addAccountModal";
 
 export default function ConditionalLayout({
   children,
@@ -82,6 +83,7 @@ export default function ConditionalLayout({
       </div>
       <AddTransactionModal />
       <AddGoalModal />
+      <AddAccountModal />
     </div>
   );
 }

@@ -21,6 +21,10 @@ export const useDeleteTransaction = () => {
         queryKey: ["transactions"],
         refetchType: "active",
       });
+      queryClient.invalidateQueries({
+        queryKey: ["accounts"],
+        refetchType: "active",
+      });
       queryClient.invalidateQueries({ queryKey: ["financial-summary"] });
     },
   });

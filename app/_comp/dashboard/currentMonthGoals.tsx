@@ -10,12 +10,14 @@ import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Card, Checkbox, Popconfirm, Tag, Tooltip } from "antd";
 import dayjs from "dayjs";
 import { Flame, PlusCircleIcon } from "lucide-react";
+import { memo } from "react";
 
 const CurrentMonthGoals = () => {
   const currentMonth = dayjs().month() + 1;
   const { data: goals, isPending } = useGetGoals(currentMonth);
   const setOpenAddGoalDialog = useUserStore((state) => state.setAddGoalDialog);
   const setEditingGoal = useUserStore((state) => state.setEditingGoal);
+  const setSelectedMonth = useUserStore((state) => state.setSelectedMonth);
   const { mutateAsync: deleteGoal } = useDeleteGoal();
   const { mutateAsync: updateGoal } = useUpdateGoal();
 
@@ -30,7 +32,10 @@ const CurrentMonthGoals = () => {
       status: !goal.status,
     });
   };
-
+  const handleAddNewGoal = () => {
+    setOpenAddGoalDialog(true);
+    setSelectedMonth(dayjs().month() + 1);
+  };
   if (!goals?.length) {
     return (
       <Card className="flex items-center justify-center font-bold shadow-sm">
@@ -48,6 +53,7 @@ const CurrentMonthGoals = () => {
     <Card
       className="flex flex-col gap-4 shadow-sm h-full"
       styles={{ body: { padding: "1.5rem" } }}
+      loading={isPending}
     >
       <div className="flex items-center justify-between mb-2">
         <h1 className="text-xl font-bold flex items-center gap-2 text-gray-800">
@@ -58,7 +64,8 @@ const CurrentMonthGoals = () => {
           type="primary"
           shape="circle"
           icon={<PlusCircleIcon size={18} />}
-          onClick={() => setOpenAddGoalDialog(true)}
+          onClick={handleAddNewGoal}
+          title="Add Goal For Current Month"
           className="flex items-center justify-center bg-black hover:bg-gray-800 border-none"
         />
       </div>
@@ -128,4 +135,4 @@ const CurrentMonthGoals = () => {
   );
 };
 
-export default CurrentMonthGoals;
+export default memo(CurrentMonthGoals);

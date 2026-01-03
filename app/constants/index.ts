@@ -34,7 +34,7 @@ export const navigation = [
   { name: "Goals", href: "/goals", icon: Target },
   { name: "Accounts", href: "/accounts", icon: Wallet },
   { name: "Reports", href: "/reports", icon: Banknote },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Settings", href: "/edit-profile", icon: Settings },
 ];
 
 export const categoryIcons: Record<string, LucideIcon> = {

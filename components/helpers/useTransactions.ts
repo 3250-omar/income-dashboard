@@ -6,17 +6,19 @@ export const useTransactions = ({
   type,
   enabled,
   userId,
+  accountId,
   page,
   pageSize,
 }: {
   type?: "income" | "expense";
   enabled?: boolean;
   userId?: string;
+  accountId?: string;
   page?: number;
   pageSize?: number;
 }) => {
   return useQuery({
-    queryKey: ["transactions", type, userId, page, pageSize],
+    queryKey: ["transactions", type, userId, accountId, page, pageSize],
     enabled,
     queryFn: async (): Promise<{
       transactions: Transaction[];
@@ -32,6 +34,9 @@ export const useTransactions = ({
       }
       if (userId) {
         query = query.eq("user_id", userId);
+      }
+      if (accountId) {
+        query = query.eq("account_id", accountId);
       }
 
       if (page !== undefined && pageSize !== undefined) {

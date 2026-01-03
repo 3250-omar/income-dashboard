@@ -15,6 +15,10 @@ interface UserStore {
   setSelectedMonth: (month: number | undefined) => void;
   editingGoal: any | null;
   setEditingGoal: (goal: any | null) => void;
+  accountDialogIsOpen: boolean;
+  setAccountDialogIsOpen: (isOpen: boolean) => void;
+  editingAccount: any | null;
+  setEditingAccount: (account: any | null) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -24,6 +28,10 @@ export const useUserStore = create<UserStore>((set) => ({
   selectedMonth: undefined,
   addGoalDialogIsOpen: false,
   editingGoal: null,
+  accountDialogIsOpen: false,
+  editingAccount: null,
+  setEditingAccount: (account) => set({ editingAccount: account }),
+  setAccountDialogIsOpen: (isOpen) => set({ accountDialogIsOpen: isOpen }),
   setEditingGoal: (goal) => set({ editingGoal: goal }),
   setSessionUserData: (sessionUserData) => set({ sessionUserData }),
   setProfile: (profile) => set({ profile }),

@@ -10,4 +10,5 @@ export interface Transaction {
   date: string;
   created_at: string;
   otherCategory?: string;
+  account_id?: string;
 }

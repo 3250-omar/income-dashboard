@@ -2,6 +2,7 @@
 import { expenseCategories, incomeCategories } from "@/app/constants";
 import { useUserStore } from "@/app/store/user_store";
 import { useCreateTransaction } from "@/components/helpers/useCreateTransaction";
+import { AccountSelector } from "../selectors/accountSelector";
 import {
   Button,
   DatePicker,
@@ -21,12 +22,14 @@ interface formValues {
   description?: string;
   date: string;
   otherCategory?: string;
+  account_id?: string;
 }
 
 const { Item } = Form;
 const AddTransactionModal = () => {
   const { dialogIsOpen, setDialogIsOpen } = useUserStore();
-  const { mutateAsync } = useCreateTransaction();
+  const { mutateAsync, isPending: isLoading } = useCreateTransaction();
+
   const [form] = Form.useForm();
   const typeValue = Form.useWatch("type", form);
   const categoryValue = Form.useWatch("category", form);
@@ -109,6 +112,14 @@ const AddTransactionModal = () => {
           />
         </Item>
         <Item
+          label="Account"
+          name="account_id"
+          rules={[{ required: true, message: "Please select an account" }]}
+        >
+          <AccountSelector />
+        </Item>
+
+        <Item
           label="Date"
           name="date"
           rules={[{ required: true, message: "Please select a date" }]}
@@ -128,7 +139,7 @@ const AddTransactionModal = () => {
         </Item>
         <Divider />
         <div className="flex justify-center gap-4 items-center">
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={isLoading}>
             Add Transaction
           </Button>
           <Button

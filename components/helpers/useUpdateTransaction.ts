@@ -16,6 +16,7 @@ export const useUpdateTransaction = () => {
         category: string;
         description: string;
         date: string;
+        account_id: string;
       }>;
     }) => {
       const { error } = await supabase
@@ -28,6 +29,7 @@ export const useUpdateTransaction = () => {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
       queryClient.invalidateQueries({ queryKey: ["financial-summary"] });
     },
   });

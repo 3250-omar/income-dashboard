@@ -15,3 +15,11 @@ export interface Expenses {
   user_id: string;
   created_at: string;
 }
+
+export interface Account {
+  id: string;
+  name: string;
+  balance: number;
+  user_id: string;
+  created_at: string;
+}
