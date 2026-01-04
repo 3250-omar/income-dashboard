@@ -21,14 +21,15 @@ export default function ConditionalLayout({
   useEffect(() => {
     // Initial session check
     const checkSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error || !data.session) {
+      const { data, error } = await supabase.auth.getUser();
+      console.log("🚀 ~ checkSession ~ data:", data);
+      if (error || !data?.user) {
         if (!pathname.includes("sign-in")) {
           router.push("/sign-in");
         }
         return;
       }
-      setUser(data.session.user);
+      setUser(data?.user);
     };
 
     checkSession();
