@@ -68,6 +68,8 @@ export const useDeleteAccount = () => {
         queryKey: ["accounts"],
         refetchType: "active",
       });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["financial-summary"] });
     },
   });
 };

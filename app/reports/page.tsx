@@ -1,11 +1,14 @@
 "use client";
 import React, { useState, useMemo, useCallback } from "react";
+import dayjs from "dayjs";
 import dynamic from "next/dynamic";
-import { Spin, Typography, Modal, Progress, Skeleton } from "antd";
+import { Spin, Typography, Skeleton } from "antd";
 import { useTransactions } from "@/components/helpers/useTransactions";
 import { useGetAccounts } from "../accounts/api/query";
 import { useGetGoals } from "@/components/helpers/useGetGoals";
+import { useFinancialSummary } from "@/components/helpers/useFinancialSummary";
 import { useUserStore } from "../store/user_store";
+import { ExportModal } from "./_comp/ExportModal";
 
 // Modular Components (Dynamic Imports)
 const ControlsSection = dynamic(
@@ -67,7 +70,6 @@ const FinancialInsights = dynamic(
 );
 
 const { Text } = Typography;
-const margin = 10;
 
 export type ReportCategory = "all" | "transactions" | "accounts" | "goals";
 
@@ -93,6 +95,10 @@ const Report = () => {
 
   const { data: accountsData, isLoading: accountsLoading } = useGetAccounts();
   const { data: goalsData, isLoading: goalsLoading } = useGetGoals();
+  const { data: summaryData, isLoading: summaryLoading } = useFinancialSummary({
+    userId: sessionUserData?.id,
+    enabled: !!sessionUserData?.id,
+  });
 
   const transactions = useMemo(
     () => transactionsData?.transactions || [],
@@ -101,7 +107,8 @@ const Report = () => {
   const accounts = useMemo(() => accountsData || [], [accountsData]);
   const goals = useMemo(() => goalsData || [], [goalsData]);
 
-  const isLoading = transLoading || accountsLoading || goalsLoading;
+  const isLoading =
+    transLoading || accountsLoading || goalsLoading || summaryLoading;
 
   const downloadPDF = useCallback(async () => {
     const element = document.getElementById("pdf-content");
@@ -112,73 +119,95 @@ const Report = () => {
 
     const progressInterval = setInterval(() => {
       setExportProgress((prev: number) => {
-        if (prev >= 95) {
+        if (prev >= 90) {
           clearInterval(progressInterval);
-          return 95;
+          return 90;
         }
-        return prev + 15;
+        return prev + 10;
       });
     }, 200);
 
-    try {
-      // Dynamic imports for heavy libraries
-      const [html2canvas, { default: jsPDF }] = await Promise.all([
-        import("html2canvas"),
-        import("jspdf"),
-      ]);
+    // Use setTimeout to allow the UI to update and show the modal immediately
+    // before starting the heavy processing and resource-intensive imports.
+    setTimeout(async () => {
+      try {
+        const [html2canvas, { default: jsPDF }] = await Promise.all([
+          import("html2canvas"),
+          import("jspdf"),
+        ]);
 
-      const canvas = await html2canvas.default(element, {
-        scale: 1.5,
-        backgroundColor: "#ffffff",
-        useCORS: true,
-        logging: false,
-        allowTaint: true,
-      });
+        // Store original styles to restore them later
+        const originalStyle = element.style.cssText;
+        // Temporarily set a fixed width to ensure consistent layout for capture,
+        // preventing responsive layout shifts that could clip content.
+        element.style.width = "1200px";
+        // Remove border radius to ensure clean edges for PDF rendering,
+        // as rounded corners can sometimes cause rendering artifacts.
+        element.style.borderRadius = "0";
 
-      setExportProgress(95);
+        const canvas = await html2canvas.default(element, {
+          scale: 2, // Higher scale for better quality
+          backgroundColor: "#ffffff",
+          useCORS: true,
+          logging: false,
+          allowTaint: true,
+          // Account for current scroll position to ensure the entire visible content is captured,
+          // even if the user has scrolled down the page.
+          scrollY: -window.scrollY,
+          // Force the layout to render as if it were a desktop view,
+          // preventing mobile-specific layouts from being captured.
+          windowWidth: 1200,
+        });
 
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        // Restore original styling after capture
+        element.style.cssText = originalStyle;
 
-      pdf.addImage(
-        imgData,
-        "PNG",
-        margin,
-        margin,
-        pdfWidth - margin * 2,
-        pdfHeight
-      );
+        setExportProgress(95);
 
-      setExportProgress(100);
-      pdf.save(`${category}-financial-report.pdf`);
-    } catch (error) {
-      console.error("Export failed:", error);
-    } finally {
-      clearInterval(progressInterval);
-      setTimeout(() => {
-        setIsExporting(false);
-        setExportProgress(0);
-      }, 500);
-    }
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4");
+
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        let heightLeft = pdfHeight;
+        let position = 0;
+
+        // First Page
+        pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+
+        // Additional Pages
+        while (heightLeft > 0) {
+          position = heightLeft - pdfHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
+          heightLeft -= pageHeight;
+        }
+
+        setExportProgress(100);
+        pdf.save(`${category}-financial-report.pdf`);
+      } catch (error) {
+        console.error("Export failed:", error);
+      } finally {
+        clearInterval(progressInterval);
+        setTimeout(() => {
+          setIsExporting(false);
+          setExportProgress(0);
+        }, 500);
+      }
+    }, 0);
   }, [category]);
 
   // --- Advanced Data Processing ---
 
-  const generatedDate = useMemo(() => new Date().toLocaleDateString(), []);
-
   const processedData = useMemo(() => {
-    // Category Breakdown
+    // Category Breakdown (Still needed from transactions)
     const categoryMap: Record<string, number> = {};
-    let totalIncome = 0;
-    let totalExpenses = 0;
-
     transactions.forEach((t: any) => {
-      if (t.type === "income") {
-        totalIncome += t.amount;
-      } else {
-        totalExpenses += t.amount;
+      if (t.type === "expense") {
         categoryMap[t.category] = (categoryMap[t.category] || 0) + t.amount;
       }
     });
@@ -187,10 +216,10 @@ const Report = () => {
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
 
-    const totalBalance = accounts.reduce(
-      (sum: number, a: any) => sum + (a.balance || 0),
-      0
-    );
+    // Summary Stats from useFinancialSummary
+    const totalIncome = summaryData?.income || 0;
+    const totalExpenses = summaryData?.expenses || 0;
+    const totalBalance = summaryData?.balance || 0;
     const completedGoals = goals.filter((g: any) => g.status).length;
 
     // Advanced Metrics
@@ -205,7 +234,7 @@ const Report = () => {
     const avgTransactionSize =
       transactions.length > 0 ? totalExpenses / transactions.length : 0;
 
-    const summaryData = [
+    const summaryChartData = [
       {
         name: "Income",
         amount: totalIncome,
@@ -233,9 +262,9 @@ const Report = () => {
         expenseRatio,
         avgTransactionSize,
       },
-      summaryData,
+      summaryData: summaryChartData,
     };
-  }, [transactions, accounts, goals]);
+  }, [transactions, goals, summaryData]);
 
   if (isLoading) {
     return (
@@ -259,11 +288,7 @@ const Report = () => {
         id="pdf-content"
         className="space-y-8 bg-[#f9fafb] p-8 md:p-12 rounded-3xl print:p-0 print:bg-[#ffffff] print:rounded-none shadow-sm"
       >
-        <ReportHeader
-          category={category}
-          generatedDate={generatedDate}
-          userEmail={sessionUserData?.email}
-        />
+        <ReportHeader category={category} userEmail={sessionUserData?.email} />
 
         {/* Global Summary & Insights */}
         {(category === "all" || category === "transactions") && (
@@ -294,35 +319,18 @@ const Report = () => {
         <div className="border-t border-[#f3f4f6] pt-8 text-center bg-[#ffffff] p-6 rounded-2xl">
           <Text type="secondary" className="text-xs text-[#9ca3af]">
             This report represents your financial activity and goals as of{" "}
-            {generatedDate}.
+            {dayjs().format("YYYY-MM-DD")}.
             <br />
             Confidential Document • Generated by Income Dashboard
           </Text>
         </div>
       </div>
 
-      <Modal
-        title="Generating Report"
-        open={isExporting}
-        footer={null}
-        closable={false}
-        centered
-        maskClosable={false}
-      >
-        <div className="py-6 text-center space-y-4">
-          <Text type="secondary">
-            Preparing your {category} report. This may take a few moments...
-          </Text>
-          <Progress
-            percent={exportProgress}
-            status="active"
-            strokeColor={{
-              "0%": "#3b82f6",
-              "100%": "#10b981",
-            }}
-          />
-        </div>
-      </Modal>
+      <ExportModal
+        isExporting={isExporting}
+        category={category}
+        exportProgress={exportProgress}
+      />
     </div>
   );
 };

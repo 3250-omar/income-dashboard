@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Button, Spin, Typography, Empty, Row, Col, Space } from "antd";
 import { useUserStore } from "@/app/store/user_store";
@@ -10,7 +10,8 @@ import { AccountCard } from "./_comp/AccountCard";
 const { Title, Paragraph, Text } = Typography;
 
 const AccountsPage = () => {
-  const { setAccountDialogIsOpen, setEditingAccount } = useUserStore();
+  const { setAccountDialogIsOpen, setEditingAccount, setAccounts } =
+    useUserStore();
   const { data: accounts, isLoading } = useGetAccounts();
 
   const handleAddAccount = () => {

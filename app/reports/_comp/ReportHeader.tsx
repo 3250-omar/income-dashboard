@@ -2,16 +2,17 @@
 import React from "react";
 import { Typography } from "antd";
 
+import dayjs from "dayjs";
+
 const { Title, Text } = Typography;
 
 interface ReportHeaderProps {
   category: string;
-  generatedDate: string;
   userEmail: string | undefined;
 }
 
 export const ReportHeader: React.FC<ReportHeaderProps> = React.memo(
-  ({ category, generatedDate, userEmail }) => {
+  ({ category, userEmail }) => {
     return (
       <div className="flex justify-between items-end border-b border-[#f3f4f6] pb-6">
         <div>
@@ -19,7 +20,7 @@ export const ReportHeader: React.FC<ReportHeaderProps> = React.memo(
             {category} Report
           </Title>
           <Text type="secondary" className="text-[#6b7280]">
-            Generated on {generatedDate}
+            Generated on {dayjs().format("YYYY-MM-DD")}
           </Text>
         </div>
         <div className="text-right">

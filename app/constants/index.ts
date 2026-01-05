@@ -25,6 +25,7 @@ import {
   CloudRain,
   Wind,
   Gift,
+  WorkflowIcon,
 } from "lucide-react";
 
 export const navigation = [
@@ -38,14 +39,15 @@ export const navigation = [
 ];
 
 export const categoryIcons: Record<string, LucideIcon> = {
-  Salary: DollarSign,
-  Food: Utensils,
-  Bills: HomeIcon,
-  Shopping: ShoppingCart,
-  Entertainment: Film,
-  Transportation: Car,
-  Healthcare: Heart,
-  Other: MoreHorizontal,
+  salary: DollarSign,
+  food: Utensils,
+  bills: HomeIcon,
+  shopping: ShoppingCart,
+  entertainment: Film,
+  freelance: WorkflowIcon,
+  transportation: Car,
+  healthcare: Heart,
+  other: MoreHorizontal,
 };
 
 export const presentageCategoryColors = {

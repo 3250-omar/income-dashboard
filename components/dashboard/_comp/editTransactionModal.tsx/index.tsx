@@ -2,6 +2,7 @@ import CategorySelector from "@/app/_comp/selectors/categorySelector";
 import { useUpdateTransaction } from "@/components/helpers/useUpdateTransaction";
 import { Transaction } from "@/types/transaction";
 import { Form, Input, InputNumber, Modal, Select } from "antd";
+import { useUserStore } from "@/app/store/user_store";
 import { useEffect } from "react";
 
 const { Item } = Form;
@@ -9,32 +10,48 @@ const EditTransactionModal = ({
   isModal,
   setIsModal,
 }: {
-  isModal: { open: boolean; record: Transaction };
-  setIsModal: (value: { open: boolean; record: Transaction }) => void;
+  isModal?: { open: boolean; record: Transaction };
+  setIsModal?: (value: { open: boolean; record: Transaction }) => void;
 }) => {
+  const {
+    editingTransaction,
+    setEditingTransaction,
+    isEditTransactionModalOpen,
+    setIsEditTransactionModalOpen,
+  } = useUserStore();
   const [form] = Form.useForm();
   const { mutateAsync: updateTransaction } = useUpdateTransaction();
 
-  useEffect(() => {
-    if (isModal.open) {
-      form.setFieldsValue(isModal.record);
+  // Use either props or global state
+  const isOpen = isModal?.open || isEditTransactionModalOpen;
+  const record = isModal?.record || editingTransaction;
+
+  const handleCancel = () => {
+    if (setIsModal) {
+      setIsModal({ open: false, record: {} as Transaction });
     }
-  }, [isModal.open, isModal.record, form]);
+    setIsEditTransactionModalOpen(false);
+    setEditingTransaction(null);
+  };
+
+  useEffect(() => {
+    if (isOpen && record) {
+      form.setFieldsValue(record);
+    }
+  }, [isOpen, record, form]);
+
   const onFinish = async () => {
     const values = form.getFieldsValue();
-    console.log(values);
-    const sentData = { ...values, id: isModal.record.id };
-    await updateTransaction({ id: isModal.record.id, updates: sentData });
-    setIsModal({
-      open: false,
-      record: {} as Transaction,
-    });
+    if (!record?.id) return;
+    const sentData = { ...values, id: record.id };
+    await updateTransaction({ id: record.id, updates: sentData });
+    handleCancel();
   };
   return (
     <Modal
       title={"Edit Transaction Info"}
-      open={isModal.open}
-      onCancel={() => setIsModal({ open: false, record: {} as Transaction })}
+      open={isOpen}
+      onCancel={handleCancel}
       styles={{
         body: {
           padding: "20px",

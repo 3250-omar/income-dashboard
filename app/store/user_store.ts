@@ -7,6 +7,7 @@ interface UserStore {
   profile: userType | null;
   setSessionUserData: (user: User | null) => void;
   setProfile: (profile: userType | null) => void;
+  accounts: any | null;
   dialogIsOpen: boolean;
   setDialogIsOpen: (isOpen: boolean) => void;
   addGoalDialogIsOpen: boolean;
@@ -19,6 +20,11 @@ interface UserStore {
   setAccountDialogIsOpen: (isOpen: boolean) => void;
   editingAccount: any | null;
   setEditingAccount: (account: any | null) => void;
+  setAccounts: (accounts: any | null) => void;
+  editingTransaction: any | null;
+  setEditingTransaction: (transaction: any | null) => void;
+  isEditTransactionModalOpen: boolean;
+  setIsEditTransactionModalOpen: (isOpen: boolean) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -30,6 +36,14 @@ export const useUserStore = create<UserStore>((set) => ({
   editingGoal: null,
   accountDialogIsOpen: false,
   editingAccount: null,
+  accounts: null,
+  editingTransaction: null,
+  isEditTransactionModalOpen: false,
+  setEditingTransaction: (transaction) =>
+    set({ editingTransaction: transaction }),
+  setIsEditTransactionModalOpen: (isOpen) =>
+    set({ isEditTransactionModalOpen: isOpen }),
+  setAccounts: (accounts) => set({ accounts }),
   setEditingAccount: (account) => set({ editingAccount: account }),
   setAccountDialogIsOpen: (isOpen) => set({ accountDialogIsOpen: isOpen }),
   setEditingGoal: (goal) => set({ editingGoal: goal }),

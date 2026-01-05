@@ -23,74 +23,103 @@ interface ReportChartsProps {
 
 export const ReportCharts: React.FC<ReportChartsProps> = React.memo(
   ({ categoryData, summaryData, colors }) => {
+    console.log(
+      "🚀 ~ summaryData:",
+      summaryData.filter((item) => item.amount > 0)
+    );
     return (
       <Row gutter={[24, 24]}>
-        <Col xs={24} lg={12}>
-          <Card
-            title={<span className="text-[#111827]">Spending by Category</span>}
-            variant="borderless"
-            className="shadow-sm h-full bg-[#ffffff]"
-          >
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={categoryData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {categoryData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={colors[index % colors.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <ReTooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+        {categoryData?.length ? (
+          <Col xs={24} lg={12}>
+            <Card
+              title={
+                <div className="py-2.5 text-[#111827]">
+                  Spending by Category
+                </div>
+              }
+              variant="borderless"
+              className="shadow-sm h-full bg-[#ffffff]"
+            >
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={categoryData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {categoryData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={colors[index % colors.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <ReTooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+          </Col>
+        ) : (
+          <Col xs={24} lg={12}>
+            <div className="flex items-center justify-center h-[380px] bg-white rounded-2xl border border-dashed border-[#10b981]">
+              <span className="font-semibold text-xl text-[#10b981]">
+                You Have no Expenses Yet
+              </span>
             </div>
-          </Card>
-        </Col>
+          </Col>
+        )}
+
         <Col xs={24} lg={12}>
-          <Card
-            title={<span className="text-[#111827]">Income vs Expenses</span>}
-            variant="borderless"
-            className="shadow-sm h-full bg-[#ffffff]"
-          >
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={summaryData}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={false}
-                    stroke="#f3f4f6"
-                  />
-                  <XAxis dataKey="name" stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" />
-                  <ReTooltip
-                    contentStyle={{
-                      borderRadius: "8px",
-                      border: "none",
-                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                    }}
-                  />
-                  <Bar
-                    dataKey="amount"
-                    fill="#3b82f6"
-                    radius={[4, 4, 0, 0]}
-                    barSize={60}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+          {summaryData?.filter((item) => item.amount > 0)?.length ? (
+            <Card
+              title={
+                <div className="py-2.5 text-[#111827]">Income vs Expenses</div>
+              }
+              variant="borderless"
+              className="shadow-sm h-full bg-[#ffffff]"
+            >
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={summaryData}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="#f3f4f6"
+                    />
+                    <XAxis dataKey="name" stroke="#6b7280" />
+                    <YAxis stroke="#6b7280" />
+                    <ReTooltip
+                      contentStyle={{
+                        borderRadius: "8px",
+                        border: "none",
+                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                      }}
+                    />
+                    <Bar
+                      dataKey="amount"
+                      fill="#3b82f6"
+                      radius={[4, 4, 0, 0]}
+                      barSize={60}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+          ) : (
+            <div className="flex items-center justify-center h-[380px] bg-white rounded-2xl border border-dashed border-[#3b82f6]">
+              <span className="font-semibold text-xl text-[#3b82f6]">
+                You Have no Transactions Yet
+              </span>
             </div>
-          </Card>
+          )}
         </Col>
       </Row>
     );

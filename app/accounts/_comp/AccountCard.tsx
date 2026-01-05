@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useCallback } from "react";
 import {
   Card,
   Button,
@@ -9,12 +9,16 @@ import {
   Spin,
   message,
   Modal,
+  Tooltip,
 } from "antd";
 import { MoreVertical, Edit, Trash2, PlusCircle } from "lucide-react";
 import { useUserStore } from "@/app/store/user_store";
 import { useDeleteAccount } from "@/app/accounts/api/actions";
 import { categoryIcons } from "@/app/constants";
 import { useTransactions } from "@/components/helpers/useTransactions";
+import { useDeleteTransaction } from "@/components/helpers/useDeleteTransaction";
+import { Transaction } from "@/types/transaction";
+import EditTransactionModal from "@/components/dashboard/_comp/editTransactionModal.tsx";
 
 const { Text, Title } = Typography;
 
@@ -27,9 +31,15 @@ interface AccountCardProps {
 }
 
 export const AccountCard = ({ account }: AccountCardProps) => {
-  const { setAccountDialogIsOpen, setEditingAccount, setDialogIsOpen } =
-    useUserStore();
+  const {
+    setAccountDialogIsOpen,
+    setEditingAccount,
+    setDialogIsOpen,
+    setEditingTransaction,
+    setIsEditTransactionModalOpen,
+  } = useUserStore();
   const { mutateAsync: deleteAccount } = useDeleteAccount();
+  const { mutateAsync: deleteTransaction } = useDeleteTransaction();
 
   const { data, isLoading } = useTransactions({
     accountId: account.id,
@@ -77,6 +87,44 @@ export const AccountCard = ({ account }: AccountCardProps) => {
       danger: true,
     },
   ];
+
+  const getTransactionMenuItems = useCallback(
+    (transaction: Transaction) => [
+      {
+        key: "edit",
+        icon: <Edit className="w-4 h-4" />,
+        label: "Edit",
+        onClick: () => {
+          setEditingTransaction(transaction);
+          setIsEditTransactionModalOpen(true);
+        },
+      },
+      {
+        key: "delete",
+        icon: <Trash2 className="w-4 h-4" />,
+        label: "Delete",
+        danger: true,
+        onClick: () => {
+          Modal.confirm({
+            title: "Delete Transaction",
+            content: "Are you sure you want to delete this transaction?",
+            okText: "Yes",
+            okType: "danger",
+            cancelText: "No",
+            onOk: async () => {
+              try {
+                await deleteTransaction(transaction.id);
+                message.success("Transaction deleted successfully");
+              } catch (error) {
+                message.error(`Error deleting transaction: ${error}`);
+              }
+            },
+          });
+        },
+      },
+    ],
+    [setEditingTransaction, setIsEditTransactionModalOpen, deleteTransaction]
+  );
 
   return (
     <Card
@@ -143,7 +191,7 @@ export const AccountCard = ({ account }: AccountCardProps) => {
             transactions.map((transaction) => {
               const Icon =
                 categoryIcons[
-                  transaction.category as keyof typeof categoryIcons
+                  transaction?.category as keyof typeof categoryIcons
                 ] || MoreVertical;
               return (
                 <div
@@ -161,30 +209,51 @@ export const AccountCard = ({ account }: AccountCardProps) => {
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="flex flex-col">
-                      <Text className="font-medium text-gray-700 truncate max-w-[140px]">
-                        {transaction.description}
-                      </Text>
+                      <Tooltip title={transaction.description}>
+                        <Text className="font-medium text-gray-700 truncate max-w-[140px]">
+                          {transaction.description}
+                        </Text>
+                      </Tooltip>
+
                       <Text type="secondary" className="text-[11px]">
                         {new Date(transaction.date).toLocaleDateString()}
                       </Text>
                     </div>
                   </div>
-                  <Text
-                    className={`font-semibold ${
-                      transaction.type === "income"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {transaction.type === "income" ? "+" : "-"}$
-                    {transaction.amount.toFixed(2)}
-                  </Text>
+                  <div className="flex items-center gap-2">
+                    <Text
+                      className={`font-semibold ${
+                        transaction.type === "income"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {transaction.type === "income" ? "+" : "-"}$
+                      {transaction.amount.toFixed(2)}
+                    </Text>
+                    <Dropdown
+                      menu={{
+                        items: getTransactionMenuItems(
+                          transaction as Transaction
+                        ),
+                      }}
+                      trigger={["click"]}
+                      placement="bottomRight"
+                    >
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<MoreVertical className="w-4 h-4" />}
+                      />
+                    </Dropdown>
+                  </div>
                 </div>
               );
             })
           )}
         </div>
       </div>
+      <EditTransactionModal />
     </Card>
   );
 };

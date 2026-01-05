@@ -15,24 +15,39 @@ import {
   Space,
   Table,
   TableColumnsType,
+  Tooltip,
 } from "antd";
 import { Transaction, TransactionType } from "@/types/transaction";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDeleteTransaction } from "../helpers/useDeleteTransaction";
 import EditTransactionModal from "./_comp/editTransactionModal.tsx";
 
-export function RecentTransactionsTable() {
-  const { sessionUserData } = useUserStore();
-  const [filter, setFilter] = useState<TransactionType | "all">("all");
-  const [isModal, setIsModal] = useState<{
-    open: boolean;
-    record: Transaction;
-  }>({
-    open: false,
-    record: {} as Transaction,
-  });
+export function RecentTransactionsTable({
+  transactionsFilter,
+}: {
+  transactionsFilter: TransactionType | "all";
+}) {
+  console.log(
+    "🚀 ~ RecentTransactionsTable ~ transactionsFilter:",
+    transactionsFilter
+  );
+  const {
+    sessionUserData,
+    setIsEditTransactionModalOpen,
+    setEditingTransaction,
+  } = useUserStore();
+  //this is only initial value isnt effect the value of the filter if it changes
+  const [filter, setFilter] = useState<TransactionType | "all">(
+    transactionsFilter
+  );
+  console.log("🚀 ~ RecentTransactionsTable ~ filter:", filter);
+
+  useEffect(() => {
+    setFilter(transactionsFilter);
+  }, [transactionsFilter]);
+
   const { mutateAsync: deleteTransaction } = useDeleteTransaction();
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
   console.log("🚀 ~ RecentTransactionsTable ~ pagination:", pagination);
@@ -93,9 +108,11 @@ export function RecentTransactionsTable() {
       dataIndex: "description",
       key: "description",
       render: (value: string) => (
-        <span className="max-w-[250] truncate">
-          {value || "No Description Provided"}
-        </span>
+        <Tooltip title={value}>
+          <span className="max-w-[250] truncate">
+            {value || "No Description Provided"}
+          </span>
+        </Tooltip>
       ),
     },
     {
@@ -121,9 +138,10 @@ export function RecentTransactionsTable() {
           <Button
             icon={<Edit color="blue" size={16} />}
             type="text"
-            onClick={() =>
-              setIsModal({ open: true, record: record as Transaction })
-            }
+            onClick={() => {
+              setEditingTransaction(record as Transaction);
+              setIsEditTransactionModalOpen(true);
+            }}
           />
           <Popconfirm
             title="Are you sure you want to delete this transaction?"
@@ -172,7 +190,7 @@ export function RecentTransactionsTable() {
           }}
         />
       </CardContent>
-      <EditTransactionModal isModal={isModal} setIsModal={setIsModal} />
+      <EditTransactionModal />
     </Card>
   );
 }

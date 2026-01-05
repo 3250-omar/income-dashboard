@@ -45,28 +45,8 @@ export default function ConditionalLayout({
       }
     });
 
-    // Proactively refresh session on tab visibility change
-    // This helps avoid "JWT expired" errors after long periods of inactivity
-    // const handleVisibilityChange = async () => {
-    //   if (document.visibilityState === "visible") {
-    //     console.log("Tab visible: Refreshing session...");
-    //     const { data, error } = await supabase.auth.getSession();
-    //     if (error) {
-    //       console.error(
-    //         "Error refreshing session on visibility change:",
-    //         error
-    //       );
-    //     } else if (data.session) {
-    //       setUser(data.session.user);
-    //     }
-    //   }
-    // };
-
-    // document.addEventListener("visibilitychange", handleVisibilityChange);
-
     return () => {
       subscription.unsubscribe();
-      // document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [setUser, router, pathname]);
   if (pathname.includes("sign-in")) {
