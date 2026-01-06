@@ -7,9 +7,9 @@ export function SocialAuthButtons() {
   const oauthSignIn = async (provider: "google" | "github") => {
     const { data } = await supabase.auth.signInWithOAuth({
       provider: provider,
-      options: {
-        redirectTo: `${location.origin}/auth/callback`,
-      },
+      // options: {
+      //   redirectTo: `${location.origin}/`,
+      // },
     });
     console.log("🚀 ~ oauthSignIn ~ data:", data);
   };
