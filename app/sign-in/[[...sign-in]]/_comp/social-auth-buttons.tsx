@@ -5,9 +5,13 @@ import { supabase } from "@/lib/supabaseClient";
 
 export function SocialAuthButtons() {
   const oauthSignIn = async (provider: "google" | "github") => {
-    await supabase.auth.signInWithOAuth({
+    const { data } = await supabase.auth.signInWithOAuth({
       provider: provider,
+      options: {
+        redirectTo: `${location.origin}/auth/callback`,
+      },
     });
+    console.log("🚀 ~ oauthSignIn ~ data:", data);
   };
   return (
     <div className="mt-6">
