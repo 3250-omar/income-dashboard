@@ -16,15 +16,15 @@ export const ControlsSection: React.FC<ControlsSectionProps> = React.memo(
     return (
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#ffffff] p-6 rounded-2xl shadow-sm border border-[#f3f4f6] print:hidden">
         <div>
-          <Title level={3} className="m-0! text-[#111827]">
+          <Title level={3} className="m-0! text-[#111827] max-sm:text-xl">
             Report Dashboard
           </Title>
-          <Text type="secondary" className="text-[#6b7280]">
+          <Text type="secondary" className="text-[#6b7280] max-sm:text-sm ">
             Generate and export detailed financial reports
           </Text>
         </div>
 
-        <div className="flex items-center gap-3 w-full md:w-auto">
+        <div className="flex items-center gap-3 w-full md:w-auto max-sm:flex-col">
           <Select
             value={category}
             onChange={setCategory}

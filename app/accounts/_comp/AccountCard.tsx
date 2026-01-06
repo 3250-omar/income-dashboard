@@ -222,7 +222,7 @@ export const AccountCard = ({ account }: AccountCardProps) => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Text
-                      className={`font-semibold ${
+                      className={`font-semibold text-nowrap ${
                         transaction.type === "income"
                           ? "text-green-600"
                           : "text-red-600"

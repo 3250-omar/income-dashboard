@@ -42,16 +42,16 @@ export function SummaryCards({
     {
       title: "Total Income",
       value: `$${data?.income?.toLocaleString() || "0"}`,
-      change: "+ 8%",
-      changeType: "up",
+      change: null,
+      // changeType: "up",
       color: "text-slate-900",
       filter: "income",
     },
     {
       title: "Total Expenses",
       value: `$${data?.expenses?.toLocaleString() || "0"}`,
-      change: "- 3%",
-      changeType: "down",
+      change: null,
+      // changeType: "down",
       color: "text-slate-900",
       filter: "expense",
     },
@@ -104,7 +104,7 @@ export function SummaryCards({
           </Card>
         );
       })}
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex items-center justify-center gap-4 max-sm:flex-col">
         <div className="flex flex-col gap-4 items-center text-center">
           {!accounts?.length ? (
             <h2>Make an Account First to start adding Your Transactions</h2>

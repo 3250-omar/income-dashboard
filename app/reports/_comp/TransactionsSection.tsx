@@ -36,8 +36,8 @@ export const TransactionsSection: React.FC<TransactionsSectionProps> =
             <Text
               className={
                 type === "income"
-                  ? "text-[#16a34a] font-semibold"
-                  : "text-[#dc2626] font-semibold"
+                  ? "text-[#16a34a] font-semibold text-nowrap"
+                  : "text-[#dc2626] font-semibold text-nowrap"
               }
             >
               {type.toUpperCase()}
@@ -60,7 +60,7 @@ export const TransactionsSection: React.FC<TransactionsSectionProps> =
           dataIndex: "date",
           key: "date",
           render: (date: string) => (
-            <span className="text-[#6b7280]">{date}</span>
+            <span className="text-[#6b7280] text-nowrap">{date}</span>
           ),
         },
       ],
@@ -71,7 +71,7 @@ export const TransactionsSection: React.FC<TransactionsSectionProps> =
       <Card
         title={<span className="text-[#111827]">Recent Transactions</span>}
         variant="borderless"
-        className="shadow-sm bg-[#ffffff]"
+        className="shadow-sm bg-[#ffffff] mb-8! overflow-y-auto p-0!"
       >
         <Table
           dataSource={transactions}
@@ -80,6 +80,7 @@ export const TransactionsSection: React.FC<TransactionsSectionProps> =
           size="middle"
           rowKey="id"
           className="custom-table"
+          // scroll={{ x: "max-content" }}
         />
       </Card>
     );

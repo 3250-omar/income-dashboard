@@ -33,12 +33,17 @@ export const ReportCharts: React.FC<ReportChartsProps> = React.memo(
           <Col xs={24} lg={12}>
             <Card
               title={
-                <div className="py-2.5 text-[#111827]">
+                <div className="py-2.5 text-[#111827] max-sm:text-sm">
                   Spending by Category
                 </div>
               }
+              styles={{
+                body: {
+                  padding: "0",
+                },
+              }}
               variant="borderless"
-              className="shadow-sm h-full bg-[#ffffff]"
+              className="shadow-sm h-full bg-[#ffffff] "
             >
               <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">

@@ -71,7 +71,7 @@ const GoalItem: React.FC<GoalItemProps> = React.memo(
         </Item>
 
         {/* Main Goal Row */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 ">
           <Item name={[field.name, "status"]} valuePropName="checked" noStyle>
             <Checkbox
               onChange={handleToggle}
@@ -79,7 +79,7 @@ const GoalItem: React.FC<GoalItemProps> = React.memo(
               className="scale-125 ml-2"
             />
           </Item>
-          <div className="flex-1 flex gap-1">
+          <div className="flex-1 flex gap-1 max-sm:flex-col">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-gray-500 uppercase tracking-wide w-12">
                 Goal:
@@ -111,7 +111,7 @@ const GoalItem: React.FC<GoalItemProps> = React.memo(
                 type="text"
                 icon={<EditOutlined />}
                 onClick={handleEdit}
-                className="opacity-0 group-hover:opacity-100 transition-opacity text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                className="opacity-0 group-hover:opacity-100 max-sm:opacity-100 transition-opacity text-blue-500 hover:text-blue-600 hover:bg-blue-50"
               />
             </Tooltip>
             <Popconfirm
@@ -126,7 +126,7 @@ const GoalItem: React.FC<GoalItemProps> = React.memo(
                   type="text"
                   danger
                   icon={<DeleteOutlined />}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity max-sm:opacity-100"
                 />
               </Tooltip>
             </Popconfirm>

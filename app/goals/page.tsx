@@ -121,7 +121,7 @@ const Goals = () => {
 
   return (
     <Form form={form} onFinish={onFinish} layout="vertical">
-      <div className="max-w-4xl mx-auto p-6 flex flex-col gap-10">
+      <div className="max-w-10xl p-6 flex flex-col gap-10 max-sm:p-0">
         <GoalsHeader disabledDate={disabledDate} />
 
         <div className="w-full flex flex-col gap-6">

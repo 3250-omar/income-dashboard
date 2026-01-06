@@ -31,14 +31,14 @@ const GoalsFilter: React.FC<GoalsFilterProps> = React.memo(
     }, [listFilterMonth]);
 
     return (
-      <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+      <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm max-sm:flex-col max-sm:gap-4">
         <h2 className="text-lg font-bold text-gray-700 m-0">{headerTitle}</h2>
-        <Space size="large">
+        <Space size="large" className="max-sm:flex-col max-sm:gap-4">
           <Space>
             <span className="text-gray-400 text-sm">Status:</span>
             <Select
               placeholder="All Status"
-              className="w-32"
+              className="w-32 max-sm:w-full"
               value={listFilterStatus}
               onChange={onStatusChange}
               allowClear
@@ -52,7 +52,7 @@ const GoalsFilter: React.FC<GoalsFilterProps> = React.memo(
               placeholder="Show All"
               format="MMMM YYYY"
               onChange={onFilterChange}
-              className="w-48 rounded-lg"
+              className="w-48 max-sm:w-full rounded-lg"
               value={datePickerValue}
               allowClear
             />

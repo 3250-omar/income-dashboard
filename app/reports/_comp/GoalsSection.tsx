@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Card, Row, Col, Progress, Typography } from "antd";
+import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
 
@@ -24,7 +25,7 @@ export const GoalsSection: React.FC<GoalsSectionProps> = React.memo(
                   {goal.goal}
                 </Title>
                 <Text type="secondary" className="text-[#6b7280]">
-                  Target Month: {goal.month}
+                  Target Month: {dayjs(goal.month).format("MMMM")}
                 </Text>
               </Col>
               <Col className="text-right">

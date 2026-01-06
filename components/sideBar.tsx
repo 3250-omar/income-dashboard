@@ -9,7 +9,7 @@ const SideBar = () => {
 
   return (
     <>
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      <div className="lg:hidden fixed top-25 left-4 z-20">
         <Button
           variant="outline"
           size="icon"

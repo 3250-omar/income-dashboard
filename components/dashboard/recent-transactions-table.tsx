@@ -86,7 +86,9 @@ export function RecentTransactionsTable({
       title: "Date",
       dataIndex: "date",
       key: "date",
-      render: (text: string) => dayjs(text).format("YYYY-MM-DD"),
+      render: (text: string) => (
+        <span className="text-nowrap">{dayjs(text).format("DD-MM-YYYY")}</span>
+      ),
     },
     {
       title: "Type",
@@ -132,7 +134,6 @@ export function RecentTransactionsTable({
       title: "Actions",
       key: "actions",
       width: 150,
-      fixed: "end",
       render: (record) => (
         <Space>
           <Button
@@ -157,7 +158,7 @@ export function RecentTransactionsTable({
   return (
     <Card className="border-none shadow-sm bg-white rounded-2xl">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-xl font-bold text-slate-800">
+        <CardTitle className="text-xl font-bold text-slate-800 max-sm:text-lg">
           Recent Transactions
         </CardTitle>
         <div className="flex gap-2">
@@ -171,11 +172,11 @@ export function RecentTransactionsTable({
               setPagination({ ...pagination, current: 1 });
             }}
             value={filter}
-            className="w-[150px] h-[40px] "
+            className="w-[150px] h-[40px] max-sm:w-[100px]"
           />
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-x-auto">
         <Table
           columns={columns}
           dataSource={transactions}

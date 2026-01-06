@@ -1,11 +1,11 @@
 "use client";
 
-import { Bell, Search, Mail, Ellipsis } from "lucide-react";
+import { Bell, Search, Mail, Ellipsis, SquareStack } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useUserStore } from "@/app/store/user_store";
 import { getUserData } from "@/app/hooks/getUserData";
 import Image from "next/image";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { Dropdown, MenuProps, Space } from "antd";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -26,29 +26,32 @@ const TopHeader = () => {
       toast.error(`Error is : ${error}`);
     }
   };
-  const items: MenuProps["items"] = [
-    {
-      key: "1",
-      label: "Update Profile",
-      onClick: () => {
-        router.push("/edit-profile");
+  const items: MenuProps["items"] = useMemo(
+    () => [
+      {
+        key: "1",
+        label: "Update Profile",
+        onClick: () => {
+          router.push("/edit-profile");
+        },
       },
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "3",
-      label: "Logout",
-      danger: true,
-      onClick: logOut,
-    },
-  ];
+      {
+        type: "divider",
+      },
+      {
+        key: "3",
+        label: "Logout",
+        danger: true,
+        onClick: logOut,
+      },
+    ],
+    [logOut]
+  );
   return (
     <header className="h-20 border-b border-slate-100 bg-white flex items-center justify-between px-8 sticky top-0 z-30">
       <div className="flex items-center gap-4">
         <div className="bg-blue-600 p-2 rounded-lg">
-          <svg
+          {/* <svg
             width="24"
             height="24"
             viewBox="0 0 24 24"
@@ -77,15 +80,16 @@ const TopHeader = () => {
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-          </svg>
+          </svg> */}
+          <SquareStack color="white" onClick={() => router.push("/")} />
         </div>
-        <h2 className="text-xl font-bold text-slate-800">
-          Welcome Back, {userData?.name?.split(" ")[0] || "User"}!
+        <h2 className="text-xl font-bold text-slate-800 max-sm:hidden">
+          <span>Welcome Back, {userData?.name?.split(" ")[0] || "User"}!</span>
         </h2>
       </div>
 
       <div className="flex items-center gap-6">
-        <div className="relative w-64">
+        {/* <div className="relative w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input
             placeholder="Search"
@@ -101,7 +105,7 @@ const TopHeader = () => {
           <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
             <Bell className="w-5 h-5" />
           </button>
-        </div>
+        </div> */}
 
         <Dropdown menu={{ items }}>
           <Space>

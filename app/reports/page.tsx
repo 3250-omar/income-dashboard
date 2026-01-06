@@ -47,7 +47,9 @@ const TransactionsSection = dynamic(
     loading: () => <Skeleton active />,
   }
 );
-const AccountsSection = dynamic(
+import { AccountsSectionProps } from "./_comp/AccountsSection";
+import { getUserData } from "../hooks/getUserData";
+const AccountsSection = dynamic<AccountsSectionProps>(
   () => import("./_comp/AccountsSection").then((m) => m.AccountsSection),
   {
     ssr: false,
@@ -96,6 +98,10 @@ const Report = () => {
   const { data: accountsData, isLoading: accountsLoading } = useGetAccounts();
   const { data: goalsData, isLoading: goalsLoading } = useGetGoals();
   const { data: summaryData, isLoading: summaryLoading } = useFinancialSummary({
+    userId: sessionUserData?.id,
+    enabled: !!sessionUserData?.id,
+  });
+  const { data: userData } = getUserData({
     userId: sessionUserData?.id,
     enabled: !!sessionUserData?.id,
   });
@@ -288,7 +294,7 @@ const Report = () => {
         id="pdf-content"
         className="space-y-8 bg-[#f9fafb] p-8 md:p-12 rounded-3xl print:p-0 print:bg-[#ffffff] print:rounded-none shadow-sm"
       >
-        <ReportHeader category={category} userEmail={sessionUserData?.email} />
+        <ReportHeader category={category} userData={userData} />
 
         {/* Global Summary & Insights */}
         {(category === "all" || category === "transactions") && (
@@ -298,6 +304,9 @@ const Report = () => {
           </>
         )}
 
+        {category === "transactions" && (
+          <TransactionsSection transactions={transactions} />
+        )}
         {/* Dynamic Categorized Sections */}
         {(category === "all" || category === "transactions") && (
           <ReportCharts
@@ -307,11 +316,9 @@ const Report = () => {
           />
         )}
 
-        {category === "transactions" && (
-          <TransactionsSection transactions={transactions} />
+        {category === "accounts" && (
+          <AccountsSection accounts={accounts} transactions={transactions} />
         )}
-
-        {category === "accounts" && <AccountsSection accounts={accounts} />}
 
         {category === "goals" && <GoalsSection goals={goals} />}
 

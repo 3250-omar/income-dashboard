@@ -9,6 +9,7 @@ export const deleteUser = async (id: string) => {
 
 export const UpdateUserInfo = () => {
   const queryClient = useQueryClient();
+  const { setSessionUserData } = useUserStore();
   return useMutation({
     mutationKey: ["userUpdate"],
     mutationFn: async ({
@@ -32,7 +33,7 @@ export const UpdateUserInfo = () => {
     },
     onSuccess: (updatedUser) => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      useUserStore.getState().setSessionUserData(updatedUser);
+      setSessionUserData(updatedUser);
     },
   });
 };

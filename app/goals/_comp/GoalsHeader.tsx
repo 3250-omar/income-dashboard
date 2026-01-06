@@ -42,14 +42,14 @@ const GoalsHeader: React.FC<GoalsHeaderProps> = React.memo(
 
     return (
       <div className="flex flex-col gap-4 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between max-sm:flex-col max-sm:gap-4">
           <div className="flex items-center gap-3">
             <RocketOutlined className="text-3xl text-blue-500" />
-            <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight">
+            <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight max-sm:text-xl">
               Financial Goals
             </h1>
           </div>
-          <Space size="large">
+          <Space size="large" className="max-sm:flex-col max-sm:gap-4">
             <Item name="month" noStyle>
               <DatePicker
                 picker="month"
@@ -65,7 +65,7 @@ const GoalsHeader: React.FC<GoalsHeaderProps> = React.memo(
               icon={<PlusCircleOutlined />}
               onClick={handleAddGoal}
               disabled={!selectedMonthAdd}
-              className="shadow-md hover:shadow-lg transition-all rounded-lg h-10"
+              className="shadow-md hover:shadow-lg transition-all rounded-lg h-10 max-sm:w-56"
             >
               Add Goal
             </Button>

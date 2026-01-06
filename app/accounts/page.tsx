@@ -20,13 +20,13 @@ const AccountsPage = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 ">
       <div className="flex items-center justify-between">
         <Space orientation="vertical" size={0}>
-          <Title level={2} className="m-0! text-gray-900">
+          <Title level={2} className="m-0! text-gray-900 max-sm:text-xl!">
             Accounts
           </Title>
-          <Paragraph className="text-gray-600 m-0!">
+          <Paragraph className="text-gray-600 m-0! max-sm:text-sm!">
             Manage your bank accounts and wallets
           </Paragraph>
         </Space>
@@ -34,7 +34,7 @@ const AccountsPage = () => {
         <Button
           type="primary"
           size="large"
-          icon={<Plus className="w-5 h-5" />}
+          icon={<Plus className="w-5 h-5 max-sm:w-3 max-sm:h-3" />}
           onClick={handleAddAccount}
           className="dashboard-gradient border-none! shadow-lg hover:scale-105 transition-transform flex items-center"
         >
@@ -69,7 +69,7 @@ const AccountsPage = () => {
                     size="large"
                     icon={<Plus className="w-4 h-4" />}
                     onClick={handleAddAccount}
-                    className="dashboard-gradient border-none! mt-4"
+                    className="dashboard-gradient max-sm:text-sm border-none! mt-4"
                   >
                     Add New Account
                   </Button>

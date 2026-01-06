@@ -146,11 +146,11 @@ const EditProfile = () => {
     <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-indigo-50 p-4 sm:p-6 lg:p-8">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+        <div className="mb-8 max-sm:text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2 max-sm:text-2xl">
             Edit Profile
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 max-sm:text-sm">
             Manage your account information and settings
           </p>
         </div>

@@ -101,6 +101,7 @@ export default function RegisterPage() {
       // ✅ Successful login
       console.log("User:", data.user);
       router.push("/");
+      toast.success("Successful login");
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong");
