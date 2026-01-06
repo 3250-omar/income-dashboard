@@ -1,117 +1,112 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button, Checkbox, Form, Input } from "antd";
 import { Mail, Lock, User } from "lucide-react";
 import Link from "next/link";
-import ImageUpload from "../../../../components/imageUploadReview";
-import { useState } from "react";
 import ProfileImageUpload from "@/components/ui/profileImageUpload";
 
+const { Item } = Form;
+
 interface SignUpFormProps {
-  formData: {
-    name: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-  };
-  errors: Record<string, string>;
   isLoading: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  setFile: (file: File) => void;
+  onFinish: (values: any) => void;
+  setFile: (file: File | null) => void;
 }
 
-export function SignUpForm({
-  formData,
-  errors,
-  isLoading,
-  onChange,
-  onSubmit,
-  setFile,
-}: SignUpFormProps) {
+export function SignUpForm({ isLoading, onFinish, setFile }: SignUpFormProps) {
+  const [form] = Form.useForm();
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <ProfileImageUpload setFile={setFile} />
-      <div className="space-y-2">
-        <Label htmlFor="name">Full Name</Label>
-        <div className="relative">
-          <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-          <Input
-            id="name"
-            name="name"
-            type="text"
-            placeholder="John Doe"
-            value={formData.name}
-            onChange={onChange}
-            className="pl-10"
-          />
-        </div>
-        {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
+    <Form
+      form={form}
+      name="signup"
+      onFinish={onFinish}
+      layout="vertical"
+      requiredMark={false}
+      size="large"
+      // className="space-y-2"
+    >
+      {/* Profile Image Logic remains separate or integrated via custom handling in parent, 
+          but UI is placed here. setFile is passed from parent. */}
+      <div className="flex justify-center mb-4">
+        <ProfileImageUpload setFile={setFile} />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="you@example.com"
-            value={formData.email}
-            onChange={onChange}
-            className="pl-10"
-          />
-        </div>
-        {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
-        <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="••••••••"
-            value={formData.password}
-            onChange={onChange}
-            className="pl-10"
-          />
-        </div>
-        {errors.password && (
-          <p className="text-sm text-red-600">{errors.password}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Confirm Password</Label>
-        <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-          <Input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            placeholder="••••••••"
-            value={formData.confirmPassword}
-            onChange={onChange}
-            className="pl-10"
-          />
-        </div>
-        {errors.confirmPassword && (
-          <p className="text-sm text-red-600">{errors.confirmPassword}</p>
-        )}
-      </div>
-
-      <div className="flex items-center">
-        <input
-          id="terms"
-          type="checkbox"
-          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-          required
+      <Item
+        name="name"
+        label="Full Name"
+        rules={[{ required: true, message: "Name is required" }]}
+      >
+        <Input
+          prefix={<User className="text-gray-400" size={18} />}
+          placeholder="John Doe"
         />
-        <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
+      </Item>
+
+      <Item
+        name="email"
+        label="Email"
+        rules={[
+          { required: true, message: "Email is required" },
+          { type: "email", message: "Email is invalid" },
+        ]}
+      >
+        <Input
+          prefix={<Mail className="text-gray-400" size={18} />}
+          placeholder="you@example.com"
+        />
+      </Item>
+
+      <Item
+        name="password"
+        label="Password"
+        rules={[
+          { required: true, message: "Password is required" },
+          { min: 8, message: "Password must be at least 8 characters" },
+        ]}
+      >
+        <Input.Password
+          prefix={<Lock className="text-gray-400" size={18} />}
+          placeholder="••••••••"
+        />
+      </Item>
+
+      <Item
+        name="confirmPassword"
+        label="Confirm Password"
+        dependencies={["password"]}
+        hasFeedback
+        rules={[
+          { required: true, message: "Please confirm your password!" },
+          ({ getFieldValue }) => ({
+            validator(_, value) {
+              if (!value || getFieldValue("password") === value) {
+                return Promise.resolve();
+              }
+              return Promise.reject(new Error("Passwords do not match!"));
+            },
+          }),
+        ]}
+      >
+        <Input.Password
+          prefix={<Lock className="text-gray-400" size={18} />}
+          placeholder="••••••••"
+        />
+      </Item>
+
+      <Item
+        name="terms"
+        valuePropName="checked"
+        rules={[
+          {
+            validator: (_, value) =>
+              value
+                ? Promise.resolve()
+                : Promise.reject(
+                    new Error("Should accept terms and conditions")
+                  ),
+          },
+        ]}
+      >
+        <Checkbox>
           I agree to the{" "}
           <Link href="#" className="text-primary hover:underline">
             Terms of Service
@@ -120,12 +115,20 @@ export function SignUpForm({
           <Link href="#" className="text-primary hover:underline">
             Privacy Policy
           </Link>
-        </label>
-      </div>
+        </Checkbox>
+      </Item>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Creating account..." : "Create account"}
-      </Button>
-    </form>
+      <Item>
+        <Button
+          type="primary"
+          htmlType="submit"
+          loading={isLoading}
+          block
+          className="w-full bg-black hover:bg-black/90"
+        >
+          {isLoading ? "Creating account..." : "Create account"}
+        </Button>
+      </Item>
+    </Form>
   );
 }

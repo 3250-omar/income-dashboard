@@ -1,17 +1,12 @@
-"use client";
-import { Button } from "@/components/ui/button";
+import { Button } from "antd";
 import { Github } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 export function SocialAuthButtons() {
   const oauthSignIn = async (provider: "google" | "github") => {
-    const { data } = await supabase.auth.signInWithOAuth({
+    await supabase.auth.signInWithOAuth({
       provider: provider,
-      // options: {
-      //   redirectTo: `${location.origin}/`,
-      // },
     });
-    console.log("🚀 ~ oauthSignIn ~ data:", data);
   };
   return (
     <div className="mt-6">
@@ -26,8 +21,7 @@ export function SocialAuthButtons() {
 
       <div className="mt-6 grid grid-cols-2 gap-3">
         <Button
-          variant="outline"
-          className="w-full"
+          className="w-full flex items-center justify-center h-10"
           onClick={() => oauthSignIn("google")}
         >
           <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -51,8 +45,7 @@ export function SocialAuthButtons() {
           Google
         </Button>
         <Button
-          variant="outline"
-          className="w-full"
+          className="w-full flex items-center justify-center h-10"
           onClick={() => oauthSignIn("github")}
         >
           <Github className="w-5 h-5 mr-2" />
