@@ -52,7 +52,6 @@ export const useGetGoals = (month?: number, status?: boolean) => {
       return data;
     },
     enabled: !!sessionUserData?.id,
-    refetchOnWindowFocus: false,
   });
 };
 
