@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 export const useGetAccounts = () => {
   const sessionUserData = useUserStore((state) => state.sessionUserData);
   return useQuery({
-    queryKey: ["accounts"],
+    queryKey: ["accounts", sessionUserData?.id],
     queryFn: async () => {
       if (!sessionUserData) throw new Error("Not authenticated");
 
@@ -32,7 +32,7 @@ export const useGetGoals = (month?: number, status?: boolean) => {
   const sessionUserData = useUserStore((state) => state.sessionUserData);
 
   return useQuery({
-    queryKey: ["goals", month, status],
+    queryKey: ["goals", sessionUserData?.id, month, status],
     queryFn: async () => {
       let query = supabase
         .from("goals")
