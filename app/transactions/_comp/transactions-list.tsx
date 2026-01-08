@@ -2,13 +2,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, MoreHorizontal } from "lucide-react";
-import { useTransactions } from "@/components/helpers/useTransactions";
-import { useDeleteTransaction } from "@/components/helpers/useDeleteTransaction";
 import { categoryIcons } from "@/app/constants";
-import { useUpdateTransaction } from "@/components/helpers/useUpdateTransaction";
 import { useUserStore } from "@/app/store/user_store";
 
 import { Transaction } from "@/types/transaction";
+import { useTransactions } from "@/app/api/query";
+import { useDeleteTransaction, useUpdateTransaction } from "@/app/api/actions";
 
 interface TransactionsListProps {
   setEditingTransaction: (transaction: any | null) => void;

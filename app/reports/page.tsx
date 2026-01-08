@@ -3,10 +3,7 @@ import React, { useState, useMemo, useCallback } from "react";
 import dayjs from "dayjs";
 import dynamic from "next/dynamic";
 import { Spin, Typography, Skeleton } from "antd";
-import { useTransactions } from "@/components/helpers/useTransactions";
 import { useGetAccounts } from "../accounts/api/query";
-import { useGetGoals } from "@/components/helpers/useGetGoals";
-import { useFinancialSummary } from "@/components/helpers/useFinancialSummary";
 import { useUserStore } from "../store/user_store";
 import { ExportModal } from "./_comp/ExportModal";
 
@@ -49,6 +46,11 @@ const TransactionsSection = dynamic(
 );
 import { AccountsSectionProps } from "./_comp/AccountsSection";
 import { getUserData } from "../hooks/getUserData";
+import {
+  useFinancialSummary,
+  useGetGoals,
+  useTransactions,
+} from "../api/query";
 const AccountsSection = dynamic<AccountsSectionProps>(
   () => import("./_comp/AccountsSection").then((m) => m.AccountsSection),
   {

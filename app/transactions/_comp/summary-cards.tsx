@@ -1,5 +1,5 @@
+import { useFinancialSummary } from "@/app/api/query";
 import { useUserStore } from "@/app/store/user_store";
-import { useFinancialSummary } from "@/components/helpers/useFinancialSummary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function SummaryCards() {

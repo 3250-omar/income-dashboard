@@ -2,10 +2,9 @@
 import React, { useEffect } from "react";
 import { DatePicker, Form, Input, InputNumber, Modal } from "antd";
 import dayjs from "dayjs";
-import { useCreateGoal } from "@/components/helpers/useCreateGoal";
 import { useUserStore } from "@/app/store/user_store";
-import { useUpdateGoal } from "@/components/helpers/useUpdateGoal";
 import { Calendar, DollarSign, Target } from "lucide-react";
+import { useCreateGoal, useUpdateGoal } from "@/app/api/actions";
 
 const { Item } = Form;
 

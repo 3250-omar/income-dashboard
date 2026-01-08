@@ -9,7 +9,7 @@ const SideBar = () => {
 
   return (
     <>
-      <div className="lg:hidden fixed top-25 left-4 z-20">
+      <div className="lg:hidden fixed top-25 left-4 z-20 opacity-60 hover:opacity-100 transition-all duration-300">
         <Button
           variant="outline"
           size="icon"

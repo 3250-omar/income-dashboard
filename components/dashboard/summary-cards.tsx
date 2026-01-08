@@ -2,10 +2,9 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUpRight, ArrowDownRight, Plus } from "lucide-react";
-import { useFinancialSummary } from "../helpers/useFinancialSummary";
 import { useUserStore } from "@/app/store/user_store";
 import { Button } from "@/components/ui/button";
-import { useGetAccounts } from "@/app/api/query";
+import { useFinancialSummary, useGetAccounts } from "@/app/api/query";
 
 import { TransactionType } from "@/types/transaction";
 

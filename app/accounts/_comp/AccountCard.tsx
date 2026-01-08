@@ -15,10 +15,10 @@ import { MoreVertical, Edit, Trash2, PlusCircle } from "lucide-react";
 import { useUserStore } from "@/app/store/user_store";
 import { useDeleteAccount } from "@/app/accounts/api/actions";
 import { categoryIcons } from "@/app/constants";
-import { useTransactions } from "@/components/helpers/useTransactions";
-import { useDeleteTransaction } from "@/components/helpers/useDeleteTransaction";
 import { Transaction } from "@/types/transaction";
 import EditTransactionModal from "@/components/dashboard/_comp/editTransactionModal.tsx";
+import { useTransactions } from "@/app/api/query";
+import { useDeleteTransaction } from "@/app/api/actions";
 
 const { Text, Title } = Typography;
 

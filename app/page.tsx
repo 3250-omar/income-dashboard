@@ -24,7 +24,6 @@ const Home = () => {
           <DashboardAccounts />
         </div>
         <div className="xl:col-span-1">
-          {/* <ExpenseBreakdown /> */}
           <CurrentMonthGoals />
         </div>
       </div>
@@ -34,9 +33,6 @@ const Home = () => {
         <div className="xl:col-span-2">
           <RecentTransactionsTable transactionsFilter={transactionsFilter} />
         </div>
-        {/* <div className="xl:col-span-1">
-          <RecentTransactionsList />
-        </div> */}
       </div>
     </div>
   );

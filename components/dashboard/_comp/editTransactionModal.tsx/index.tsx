@@ -1,9 +1,9 @@
 import CategorySelector from "@/app/_comp/selectors/categorySelector";
-import { useUpdateTransaction } from "@/components/helpers/useUpdateTransaction";
 import { Transaction } from "@/types/transaction";
 import { Form, Input, InputNumber, Modal, Select } from "antd";
 import { useUserStore } from "@/app/store/user_store";
 import { useEffect } from "react";
+import { useUpdateTransaction } from "@/app/api/actions";
 
 const { Item } = Form;
 const EditTransactionModal = ({

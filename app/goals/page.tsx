@@ -1,17 +1,15 @@
 "use client";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { Form, Empty, Spin } from "antd";
-import { useGetGoals } from "@/components/helpers/useGetGoals";
-import {
-  useUpdateGoal,
-  useDeleteGoal,
-} from "@/components/helpers/useUpdateGoal";
+
 import dayjs from "dayjs";
 import { GoalItem as GoalItemType } from "./types";
 import GoalsHeader from "./_comp/GoalsHeader";
 import GoalsFilter from "./_comp/GoalsFilter";
 import GoalGroup from "./_comp/GoalGroup";
 import { useUserStore } from "../store/user_store";
+import { useGetGoals } from "../api/query";
+import { useDeleteGoal, useUpdateGoal } from "../api/actions";
 
 const { Item } = Form;
 

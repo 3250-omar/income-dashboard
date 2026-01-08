@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTransactions } from "../helpers/useTransactions";
 import { useUserStore } from "@/app/store/user_store";
 import { Edit, Filter, Trash } from "lucide-react";
 import {
@@ -21,8 +20,9 @@ import { Transaction, TransactionType } from "@/types/transaction";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import { useState, useEffect } from "react";
-import { useDeleteTransaction } from "../helpers/useDeleteTransaction";
 import EditTransactionModal from "./_comp/editTransactionModal.tsx";
+import { useTransactions } from "@/app/api/query";
+import { useDeleteTransaction } from "@/app/api/actions";
 
 export function RecentTransactionsTable({
   transactionsFilter,
