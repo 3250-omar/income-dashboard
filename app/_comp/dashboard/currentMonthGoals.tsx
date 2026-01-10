@@ -1,11 +1,9 @@
 "use client";
 
+import { useDeleteGoal, useUpdateGoal } from "@/app/api/actions";
+import { useGetGoals } from "@/app/api/query";
 import { useUserStore } from "@/app/store/user_store";
-import { useGetGoals } from "@/components/helpers/useGetGoals";
-import {
-  useDeleteGoal,
-  useUpdateGoal,
-} from "@/components/helpers/useUpdateGoal";
+
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Card, Checkbox, Popconfirm, Tag, Tooltip } from "antd";
 import dayjs from "dayjs";

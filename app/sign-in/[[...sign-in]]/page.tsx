@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { supabase } from "@/lib/supabaseClient";
 import VerificationForm from "./_comp/confirm";
 import { useUserStore } from "@/app/store/user_store";
-import { UpdateUserInfo } from "@/components/helpers/user";
+import { useUpdateUserInfo } from "@/app/api/actions";
 
 // --- Types ---
 interface SignInValues {
@@ -64,7 +64,7 @@ export default function RegisterPage() {
     "signin"
   );
 
-  const { mutateAsync: updateUserInfo } = UpdateUserInfo();
+  const { mutateAsync: updateUserInfo } = useUpdateUserInfo();
   const [isLoading, setIsLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
 

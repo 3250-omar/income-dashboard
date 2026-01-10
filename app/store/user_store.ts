@@ -2,6 +2,20 @@ import { userType } from "@/types/user";
 import { User } from "@supabase/supabase-js";
 import { create } from "zustand";
 
+const initialValues = {
+  sessionUserData: null,
+  dialogIsOpen: false,
+  profile: null,
+  selectedMonth: undefined,
+  addGoalDialogIsOpen: false,
+  editingGoal: null,
+  accountDialogIsOpen: false,
+  editingAccount: null,
+  accounts: null,
+  editingTransaction: null,
+  isEditTransactionModalOpen: false,
+};
+
 interface UserStore {
   sessionUserData: User | null;
   profile: userType | null;
@@ -28,17 +42,7 @@ interface UserStore {
 }
 
 export const useUserStore = create<UserStore>((set) => ({
-  sessionUserData: null,
-  dialogIsOpen: false,
-  profile: null,
-  selectedMonth: undefined,
-  addGoalDialogIsOpen: false,
-  editingGoal: null,
-  accountDialogIsOpen: false,
-  editingAccount: null,
-  accounts: null,
-  editingTransaction: null,
-  isEditTransactionModalOpen: false,
+  ...initialValues,
   setEditingTransaction: (transaction) =>
     set({ editingTransaction: transaction }),
   setIsEditTransactionModalOpen: (isOpen) =>
