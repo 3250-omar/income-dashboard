@@ -25,27 +25,24 @@ const TopHeader = () => {
       toast.error(`Error is : ${error}`);
     }
   };
-  const items: MenuProps["items"] = useMemo(
-    () => [
-      {
-        key: "1",
-        label: "Update Profile",
-        onClick: () => {
-          router.push("/edit-profile");
-        },
+  const items: MenuProps["items"] = [
+    {
+      key: "1",
+      label: "Update Profile",
+      onClick: () => {
+        router.push("/edit-profile");
       },
-      {
-        type: "divider",
-      },
-      {
-        key: "3",
-        label: "Logout",
-        danger: true,
-        onClick: logOut,
-      },
-    ],
-    [logOut]
-  );
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "3",
+      label: "Logout",
+      danger: true,
+      onClick: logOut,
+    },
+  ];
   return (
     <header className="h-20 border-b border-slate-100 bg-white flex items-center justify-between px-8 sticky top-0 z-30">
       <div className="flex items-center gap-4">
@@ -63,7 +60,7 @@ const TopHeader = () => {
             <div className="flex items-center gap-3 pl-6 border-l border-slate-100">
               <div className="text-right">
                 <p className="text-sm font-bold text-slate-800 max-w-[150px] truncate">
-                  {userData?.name || "Loading..."}
+                  {userData?.name || "UserName..."}
                 </p>
                 <p className="text-xs text-slate-400">Premium Member</p>
               </div>
