@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-toastify";
 import { useUserStore } from "@/app/store/user_store";
@@ -15,12 +15,16 @@ const { Item } = Form;
 
 const EditProfile = () => {
   const [form] = Form.useForm();
+  const [isUploading, setIsUploading] = useState(false);
+  const imagePreview = Form.useWatch("image_url", form);
+  console.log("🚀 ~ EditProfile ~ imagePreview:", imagePreview);
   const { mutate: updateUser, isPending } = useUpdateUserInfo();
   const sessionUserData = useUserStore((state) => state.sessionUserData);
   const { data: userProfile } = useGetUserData({
     userId: sessionUserData?.id,
     enabled: !!sessionUserData?.id,
   });
+  console.log("🚀 ~ EditProfile ~ userProfile:", userProfile);
 
   // Initialize form values
   useEffect(() => {
@@ -33,8 +37,8 @@ const EditProfile = () => {
     }
   }, [userProfile, form]);
 
-  // Handle file upload (called by ProfileAvatar)
-  const handleUpload = async (file: File): Promise<string | null> => {
+  // Upload file to Supabase Storage
+  const uploadImageToStorage = async (file: File): Promise<string | null> => {
     if (!sessionUserData?.id) return null;
 
     const fileExt = file.name.split(".").pop();
@@ -59,17 +63,39 @@ const EditProfile = () => {
 
   // Unified submission handler
   const onFinish = async (values: any) => {
+    console.log("🚀 ~ onFinish ~ values:", values);
     if (!sessionUserData?.id) return;
 
     try {
+      let imageUrlToSave = values.image_url;
+
+      // If image_url is a File object (from new upload), upload it first
+      if (values.image_url && typeof values.image_url !== "string") {
+        setIsUploading(true);
+        try {
+          const file = values.image_url as File;
+          const uploadedUrl = await uploadImageToStorage(file);
+
+          if (uploadedUrl) {
+            imageUrlToSave = uploadedUrl;
+            // Update the form field with the real URL so subsequent saves work
+            form.setFieldValue("image_url", uploadedUrl);
+          } else {
+            toast.error("Failed to upload image");
+            return; // Stop if image upload failed
+          }
+        } finally {
+          setIsUploading(false);
+        }
+      }
+
       // 1. Update Profile Info
-      // Check if profile details changed (optional optimization, but we can just update)
       updateUser({
         userId: sessionUserData.id,
         data: {
           name: values.username,
           email: values.email,
-          image_url: values.image_url,
+          image_url: imageUrlToSave,
         },
       });
 
@@ -95,12 +121,10 @@ const EditProfile = () => {
     } catch (error) {
       console.error(error);
       toast.error("Failed to update profile");
-    } finally {
-      // console.log("that will be executed after what happen ");
     }
   };
 
-  if (!userProfile) {
+  if (!userProfile || !sessionUserData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Spin size="large" />
@@ -122,15 +146,23 @@ const EditProfile = () => {
           onFinish={onFinish}
           requiredMark={false}
           initialValues={{
-            image_url: userProfile.image_url,
+            image_url: userProfile.image_url || "",
             username: userProfile.name,
             email: userProfile.email,
           }}
           className="space-y-6!"
         >
-          {/* Avatar Section - Controlled by Form */}
-          <Item name="image_url" noStyle>
-            <ProfileAvatar onUpload={handleUpload} />
+          {/* Avatar Section - Shows preview, uploads on save */}
+          <Item
+            name="image_url"
+            noStyle
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            getValueFromEvent={(e: any) => {
+              // If coming from ProfileAvatar's onChange, it's just the File object
+              return e;
+            }}
+          >
+            <ProfileAvatar />
           </Item>
 
           {/* Profile Details Section */}
@@ -144,7 +176,7 @@ const EditProfile = () => {
             <Button
               type="primary"
               htmlType="submit"
-              loading={isPending}
+              loading={isPending || isUploading}
               size="large"
               className="w-full bg-blue-600 hover:bg-blue-700! h-12 text-lg font-semibold shadow-md"
             >
