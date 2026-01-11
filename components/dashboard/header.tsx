@@ -1,9 +1,8 @@
 "use client";
 
-import { Bell, Search, Mail, Ellipsis, SquareStack } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Ellipsis, SquareStack } from "lucide-react";
 import { useUserStore } from "@/app/store/user_store";
-import { getUserData } from "@/app/hooks/getUserData";
+import { useGetUserData } from "@/app/hooks/getUserData";
 import Image from "next/image";
 import { memo, useMemo } from "react";
 import { Dropdown, MenuProps, Space } from "antd";
@@ -14,7 +13,7 @@ import { toast } from "react-toastify";
 const TopHeader = () => {
   const router = useRouter();
   const { sessionUserData } = useUserStore();
-  const { data: userData } = getUserData({
+  const { data: userData } = useGetUserData({
     userId: sessionUserData?.id,
     enabled: !!sessionUserData?.id,
   });

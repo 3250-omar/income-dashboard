@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-toastify";
 import { useUserStore } from "@/app/store/user_store";
-import { getUserData } from "@/app/hooks/getUserData";
+import { useGetUserData } from "@/app/hooks/getUserData";
 import { useUpdateUserInfo } from "../api/actions";
 import { Spin, Form, Button } from "antd";
 import ProfileHeader from "./_comp/ProfileHeader";
@@ -17,8 +17,9 @@ const EditProfile = () => {
   const [form] = Form.useForm();
   const { mutate: updateUser, isPending } = useUpdateUserInfo();
   const sessionUserData = useUserStore((state) => state.sessionUserData);
-  const { data: userProfile } = getUserData({
+  const { data: userProfile } = useGetUserData({
     userId: sessionUserData?.id,
+    enabled: !!sessionUserData?.id,
   });
 
   // Initialize form values

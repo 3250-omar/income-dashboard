@@ -13,7 +13,6 @@ interface ReportHeaderProps {
 
 export const ReportHeader: React.FC<ReportHeaderProps> = React.memo(
   ({ category, userData }) => {
-    console.log("🚀 ~ userData:", userData);
     return (
       <div className="flex justify-between items-center border-b border-[#f3f4f6] pb-6 max-sm:flex-col max-sm:gap-4 ">
         <div>
@@ -28,7 +27,7 @@ export const ReportHeader: React.FC<ReportHeaderProps> = React.memo(
           </Text>
         </div>
         <Image
-          src={userData?.image_url}
+          src={userData?.image_url || "/user-icematte_161669-211.webp"}
           width={100}
           height={100}
           className="rounded-full object-cover"

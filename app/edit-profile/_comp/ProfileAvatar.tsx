@@ -2,8 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { Upload, Avatar, Card, Button } from "antd";
 import { UserOutlined, CameraOutlined } from "@ant-design/icons";
-import type { UploadChangeParam } from "antd/es/upload";
-import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
 
 interface ProfileAvatarProps {
   value?: string;

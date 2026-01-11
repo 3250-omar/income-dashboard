@@ -45,7 +45,7 @@ const TransactionsSection = dynamic(
   }
 );
 import { AccountsSectionProps } from "./_comp/AccountsSection";
-import { getUserData } from "../hooks/getUserData";
+import { useGetUserData } from "../hooks/getUserData";
 import {
   useFinancialSummary,
   useGetGoals,
@@ -103,7 +103,7 @@ const Report = () => {
     userId: sessionUserData?.id,
     enabled: !!sessionUserData?.id,
   });
-  const { data: userData } = getUserData({
+  const { data: userData } = useGetUserData({
     userId: sessionUserData?.id,
     enabled: !!sessionUserData?.id,
   });
