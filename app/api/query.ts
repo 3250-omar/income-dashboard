@@ -52,6 +52,7 @@ export const useGetGoals = (month?: number, status?: boolean) => {
       return data;
     },
     enabled: !!sessionUserData?.id,
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -63,6 +64,7 @@ export const useTransactions = ({
   accountId,
   page,
   pageSize,
+  // month,
 }: {
   type?: "income" | "expense";
   enabled?: boolean;
@@ -70,6 +72,7 @@ export const useTransactions = ({
   accountId?: string;
   page?: number;
   pageSize?: number;
+  // month?: string;
 }) => {
   return useQuery({
     queryKey: ["transactions", type, userId, accountId, page, pageSize],
@@ -92,6 +95,9 @@ export const useTransactions = ({
       if (accountId) {
         query = query.eq("account_id", accountId);
       }
+      // if (month) {
+      //   query = query.eq("date", month);
+      // }
 
       if (page !== undefined && pageSize !== undefined) {
         const from = page * pageSize;
@@ -122,17 +128,18 @@ export const useFinancialSummary = ({
     queryKey: ["financial-summary", userId],
     enabled,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_financial_summary");
+      const { data, error } = await supabase.rpc("get_dashboard_totals");
 
       if (error) throw error;
 
-      const { income, expenses } = data[0];
+      const { current_month, net_total_all_time } = data;
       return {
-        income,
-        expenses,
-        balance: income - expenses,
+        income: current_month.income,
+        expenses: current_month.expense,
+        balance: net_total_all_time,
       };
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    // staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 };

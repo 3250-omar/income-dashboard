@@ -32,14 +32,14 @@ export function SummaryCards({
     filter: TransactionType | "all";
   }[] = [
     {
-      title: "Total Balance",
+      title: "Overall Balance",
       value: `$${data?.balance?.toLocaleString() || "0"}`,
       change: null,
       color: "text-slate-900",
       filter: "all",
     },
     {
-      title: "Total Income",
+      title: "Current Month Income",
       value: `$${data?.income?.toLocaleString() || "0"}`,
       change: null,
       // changeType: "up",
@@ -47,7 +47,7 @@ export function SummaryCards({
       filter: "income",
     },
     {
-      title: "Total Expenses",
+      title: "Current Month Expenses",
       value: `$${data?.expenses?.toLocaleString() || "0"}`,
       change: null,
       // changeType: "down",

@@ -52,6 +52,7 @@ export const ControlsSection: React.FC<ControlsSectionProps> = React.memo(
               },
             ]}
           />
+          
           <Button
             type="primary"
             icon={<Download className="w-4 h-4" />}

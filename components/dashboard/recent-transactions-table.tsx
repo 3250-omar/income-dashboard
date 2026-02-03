@@ -31,7 +31,7 @@ export function RecentTransactionsTable({
 }) {
   console.log(
     "🚀 ~ RecentTransactionsTable ~ transactionsFilter:",
-    transactionsFilter
+    transactionsFilter,
   );
   const {
     sessionUserData,
@@ -40,7 +40,7 @@ export function RecentTransactionsTable({
   } = useUserStore();
   //this is only initial value isnt effect the value of the filter if it changes
   const [filter, setFilter] = useState<TransactionType | "all">(
-    transactionsFilter
+    transactionsFilter,
   );
   console.log("🚀 ~ RecentTransactionsTable ~ filter:", filter);
 
@@ -58,6 +58,7 @@ export function RecentTransactionsTable({
     type: filter === "all" ? undefined : filter,
     page: pagination.current - 1,
     pageSize: pagination.pageSize,
+    // month: dayjs().format("MM"), 
   });
 
   const transactions = data?.transactions || [];
@@ -98,7 +99,7 @@ export function RecentTransactionsTable({
         <span
           className={cn(
             "text-xs font-bold",
-            value.type === "income" ? "text-green-500" : "text-red-500"
+            value.type === "income" ? "text-green-500" : "text-red-500",
           )}
         >
           {value.type}
